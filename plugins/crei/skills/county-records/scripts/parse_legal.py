@@ -32,6 +32,16 @@ class ReviewRecord:
     detail: str = ""
 
 
+@dataclass
+class ParsedNameLegal:
+    """Name-based legal (Pinellas style): 'LOT 4 BLOCK A PINELLE PARTIAL REPLAT'.
+    Joins via appraiser subdivision lookup, not string construction."""
+    lot: str
+    block: Optional[str]
+    subdivision: str
+    raw: str
+
+
 # Standalone unit token: "U A228", "U 101", "U 19" (not the U in "P.U.D." - the
 # dot after U breaks \s+; not "UNIT" inside subdivision names).
 _UNIT_TOKEN = re.compile(r"(?:^|\s)U\s+[A-Z0-9]")
@@ -89,5 +99,43 @@ def parse_legal(legal: str) -> Union[ParsedLegal, ReviewRecord]:
         township=township,
         range=rng,
         subid=subid_m.group(1),
+        raw=raw,
+    )
+
+
+_NB_CONDO = re.compile(r"\b(UNIT|APARTMENT|APT|CONDOMINIUM|CONDO)\b")
+_NB_LOT = re.compile(r"\bLOTS?\s+(\d+[A-Z0-9.]*)\b")
+_NB_BLOCK = re.compile(r"\bBLOCK\s+([A-Z0-9][A-Z0-9.]*)\b")
+
+
+def parse_legal_namebased(legal: str) -> Union[ParsedNameLegal, ReviewRecord]:
+    """Parse a name-based legal: LOT {n} [BLOCK {b}] [OF] {SUBDIVISION NAME}.
+
+    The subdivision NAME (not a code) is the join key - Layer A looks it up on
+    the appraiser's sub/condo search, trying name variants as needed."""
+    raw = (legal or "").strip()
+    text = re.sub(r"\s+", " ", raw.upper())
+    if not text:
+        return ReviewRecord("empty", raw)
+    if _NB_CONDO.search(text):
+        return ReviewRecord("condo_unit", raw)
+
+    lot_m = _NB_LOT.search(text)
+    if not lot_m:
+        return ReviewRecord("missing_fields", raw, detail="missing: lot")
+
+    blk_m = _NB_BLOCK.search(text)
+    # Subdivision = whatever follows the last structural token (BLOCK x or the
+    # lot clause), minus a leading OF.
+    tail_start = blk_m.end() if blk_m else lot_m.end()
+    subdivision = text[tail_start:].strip()
+    subdivision = re.sub(r"^OF\s+", "", subdivision).strip(" .,")
+    if not subdivision:
+        return ReviewRecord("missing_fields", raw, detail="missing: subdivision name")
+
+    return ParsedNameLegal(
+        lot=lot_m.group(1),
+        block=blk_m.group(1) if blk_m else None,
+        subdivision=subdivision,
         raw=raw,
     )

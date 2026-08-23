@@ -10,6 +10,8 @@
     "docTypes": {
       "lis_pendens": ["LP", "LP1"]
     },
+    "legalStyle": "str-subid",
+    "joinStrategy": "construct",
     "parcelId": {
       "format": "{T}-{R}-{S}-{SUBID}-{BLK}-{LOT}",
       "noBlockToken": "*",
@@ -36,15 +38,28 @@
     "docTypes": {
       "lis_pendens": ["LIS PENDENS"]
     },
+    "csvColumns": {
+      "legal": "Comments",
+      "caseNumber": null,
+      "provisional": null,
+      "_comment": "Pinellas export has no U/Consideration/DocLegalDescription/CaseNumber columns; the legal rides in Comments. Case-class signals cannot fire."
+    },
+    "legalStyle": "name-based",
+    "joinStrategy": "subdivision-lookup",
     "parcelId": {
-      "format": null,
-      "verified": false,
-      "notes": "Portal flow verified (prior recon, 64-row CSV export). Parcel-ID construction NOT yet verified - do not ship enriched leads until it is."
+      "format": "SS-TT-RR-NNNNN-BBB-LLLL (assigned by PCPAO, not constructible)",
+      "verified": true,
+      "verifiedDate": "2026-08-23",
+      "verifiedSamples": 3,
+      "notes": "Join verified via subdivision lookup: PINELLE PARTIAL REPLAT BLK A LOT 4, MILES PINES BLK H LOT 10, SHORE ACRES EDGEWATER SEC BLK 5 LOT 11 - all exact single matches. Condo units NOT joinable in v1 (PCPAO condo names differ from recorded names) - they route to review."
     },
     "appraiser": {
       "name": "PCPAO",
-      "type": "unknown",
-      "notes": "To be mapped during Pinellas verification."
+      "type": "subdivision-search",
+      "searchUrl": "https://www.pcpao.gov/quick-search?qu=1",
+      "searchMode": "Sub/Condo",
+      "detailsUrl": "https://www.pcpao.gov/property-details?s={strap}",
+      "notes": "Use the Sub/Condo quick search with the subdivision NAME; recorded names may be word-reordered vs PCPAO names (e.g. 'EDGEWATER SECTION OF SHORE ACRES' is 'SHORE ACRES EDGEWATER SEC') - try variants. Results include parcel ID + legal (match block/lot). Details page shows owner, site address, mailing address, sales history - map into the normalized parcel contract."
     }
   }
 }

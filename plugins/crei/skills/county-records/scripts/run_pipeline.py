@@ -14,10 +14,17 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
-from parse_legal import parse_legal, ParsedLegal
+from parse_legal import parse_legal, parse_legal_namebased, ParsedLegal, ParsedNameLegal
 from build_parcel_id import build_parcel_id
+from match_lookup import match_parcel
 from enrich import derive_signals
 from score import score_lead
+
+DEFAULT_CSV_COLUMNS = {
+    "legal": "DocLegalDescription",
+    "caseNumber": "CaseNumber",
+    "provisional": "U",
+}
 
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
 
@@ -52,6 +59,9 @@ def cmd_parse(args):
     with open(args.csv, encoding="utf-8-sig", newline="") as f:
         rows = list(csv.DictReader(f))
 
+    cols = {**DEFAULT_CSV_COLUMNS, **(cfg.get("csvColumns") or {})}
+    name_based = cfg.get("legalStyle") == "name-based"
+
     seen, records, review = set(), [], []
     for row in rows:
         instrument = (row.get("InstrumentNumber") or "").strip()
@@ -59,36 +69,50 @@ def cmd_parse(args):
             continue
         seen.add(instrument)
 
+        case_number = (row.get(cols["caseNumber"]) or "").strip() if cols.get("caseNumber") else ""
         base = {
             "instrument": instrument,
             "record_date": (parse_record_date(row.get("RecordDate")) or date.min).isoformat(),
             "doc_type": (row.get("DocTypeDescription") or "").strip(),
             "direct_name": (row.get("DirectName") or "").strip(),
             "indirect_name": (row.get("IndirectName") or "").strip(),
-            "case_number": (row.get("CaseNumber") or "").strip(),
-            "legal": (row.get("DocLegalDescription") or "").strip(),
-            "provisional": (row.get("U") or "").strip().upper() == "U",
+            "case_number": case_number,
+            "legal": (row.get(cols["legal"]) or "").strip(),
+            "provisional": ((row.get(cols["provisional"]) or "").strip().upper() == "U"
+                            if cols.get("provisional") else False),
         }
         base["case_class"] = ("CC" if "-CC-" in base["case_number"]
                               else "CA" if "-CA-" in base["case_number"] else "other")
 
-        parsed = parse_legal(base["legal"])
-        if isinstance(parsed, ParsedLegal):
-            try:
-                base["parcel_id"] = build_parcel_id(parsed, cfg.get("parcelId") or {})
-                base["subdivision"] = parsed.subdivision
+        if name_based:
+            parsed = parse_legal_namebased(base["legal"])
+            if isinstance(parsed, ParsedNameLegal):
+                base.update(parcel_id=None, lot=parsed.lot, block=parsed.block,
+                            subdivision=parsed.subdivision)
                 records.append(base)
                 continue
-            except ValueError as e:
-                review.append({**row, "review_reason": str(e)})
-                continue
+        else:
+            parsed = parse_legal(base["legal"])
+            if isinstance(parsed, ParsedLegal):
+                try:
+                    base["parcel_id"] = build_parcel_id(parsed, cfg.get("parcelId") or {})
+                    base["subdivision"] = parsed.subdivision
+                    records.append(base)
+                    continue
+                except ValueError as e:
+                    review.append({**row, "review_reason": str(e)})
+                    continue
         review.append({**row, "review_reason": f"{parsed.reason} {parsed.detail}".strip()})
 
     (out / "parsed.json").write_text(
         json.dumps({"county": args.county, "source_csv": str(args.csv),
                     "records": records}, indent=2), encoding="utf-8")
-    (out / "parcel_ids.txt").write_text(
-        "\n".join(sorted({r["parcel_id"] for r in records})) + "\n", encoding="utf-8")
+    if name_based:
+        (out / "lookups.txt").write_text(
+            "\n".join(sorted({r["subdivision"] for r in records})) + "\n", encoding="utf-8")
+    else:
+        (out / "parcel_ids.txt").write_text(
+            "\n".join(sorted({r["parcel_id"] for r in records})) + "\n", encoding="utf-8")
     if review:
         with open(out / "review.csv", "w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=list(review[0].keys()))
@@ -98,9 +122,40 @@ def cmd_parse(args):
     total = len(records) + len(review)
     print(f"parsed {len(records)}/{total} records -> {out / 'parsed.json'}")
     print(f"review {len(review)}/{total} records -> {out / 'review.csv' if review else '(none)'}")
-    if total and len(review) / total > 0.30:
-        print("WARNING: >30% of records in review - county format may differ; "
-              "investigate before shipping leads", file=sys.stderr)
+    # Condo units and metes-and-bounds are known-unjoinable categories, not
+    # parser failures - only unexpected reasons indicate a format mismatch.
+    unexpected = [r for r in review
+                  if not r["review_reason"].startswith(("condo_unit", "metes_and_bounds"))]
+    if total and len(unexpected) / total > 0.30:
+        print("WARNING: >30% of records failed parsing for unexpected reasons - "
+              "county format may differ; investigate before shipping leads",
+              file=sys.stderr)
+
+
+def cmd_match(args):
+    """Assign parcel IDs to name-based records from Layer A subdivision results."""
+    out = Path(args.out)
+    parsed = load_json(args.parsed)
+    subdivisions = load_json(args.subdivisions)
+
+    matched = unmatched = 0
+    for rec in parsed["records"]:
+        if rec.get("parcel_id"):
+            continue
+        candidates = subdivisions.get(rec.get("subdivision") or "", [])
+        pid = match_parcel(rec["lot"], rec.get("block"), candidates) if candidates else None
+        if pid:
+            rec["parcel_id"] = pid
+            matched += 1
+        else:
+            unmatched += 1
+
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "parsed.json").write_text(json.dumps(parsed, indent=2), encoding="utf-8")
+    (out / "parcel_ids.txt").write_text(
+        "\n".join(sorted({r["parcel_id"] for r in parsed["records"] if r.get("parcel_id")}))
+        + "\n", encoding="utf-8")
+    print(f"matched {matched}, unmatched {unmatched} (ship unenriched) -> {out / 'parsed.json'}")
 
 
 def cmd_score(args):
@@ -188,6 +243,13 @@ def main():
     p.add_argument("--county", required=True)
     p.add_argument("--out", required=True)
     p.set_defaults(func=cmd_parse)
+
+    m = sub.add_parser("match", help="fill parcel IDs for name-based counties from subdivision lookup results")
+    m.add_argument("--parsed", required=True)
+    m.add_argument("--subdivisions", required=True,
+                   help='JSON: {"<subdivision name>": [{"pid": ..., "legal": ...}]}')
+    m.add_argument("--out", required=True)
+    m.set_defaults(func=cmd_match)
 
     s = sub.add_parser("score", help="parsed.json + parcels.json -> ranked leads + summary")
     s.add_argument("--parsed", required=True)

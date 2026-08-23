@@ -39,9 +39,15 @@ list**. Every score is a sum of named signal contributions from
 |---|---|---|
 | 0. Route | — | Find the county in `config/counties.json`; unknown → vendor router |
 | 1. Pull | Browser | Acclaim portal → doc-type search → CSV export |
-| 2. Parse | Python | `run_pipeline.py parse` → parcel IDs + review file |
-| 3. Enrich | Browser | Fetch each parcel's appraiser record (JSON API) |
+| 2. Parse | Python | `run_pipeline.py parse` → parcel IDs (or lookup list) + review file |
+| 2b. Lookup | Browser+Python | `joinStrategy: subdivision-lookup` counties only: appraiser sub search → `run_pipeline.py match` |
+| 3. Enrich | Browser | Fetch each parcel's appraiser record → normalized contract |
 | 4. Score | Python | `run_pipeline.py score` → ranked CSV/JSON + summary |
+
+The county's `joinStrategy` decides how a record becomes a parcel ID:
+**`construct`** (e.g. Brevard) builds the ID from the legal description string;
+**`subdivision-lookup`** (e.g. Pinellas) searches the appraiser by subdivision
+NAME and matches block/lot — used where legals carry names, not codes.
 
 Scripts live at `${CLAUDE_SKILL_DIR}/scripts/`, configs at
 `${CLAUDE_SKILL_DIR}/config/`. Work in a scratch directory; suggested layout:
@@ -117,22 +123,61 @@ python ${CLAUDE_SKILL_DIR}/scripts/run_pipeline.py parse \
     --csv work/raw.csv --county brevard-fl --out work/
 ```
 
-Writes `work/parsed.json` (records with constructed parcel IDs), and
-`work/review.csv` (records that could not be parsed or constructed — condo/
-timeshare units, metes-and-bounds, unexpected tokens). **Review rows are never
-dropped**; mention their count to the user. If more than ~30% of rows land in
-review, stop and investigate before continuing — the county's format may
-differ from its config.
+Writes `work/parsed.json`, `work/review.csv` (records that could not be
+parsed — condo/timeshare units, metes-and-bounds, unexpected tokens), and the
+Stage-3 worklist: `parcel_ids.txt` for construct counties, `lookups.txt`
+(subdivision names) for lookup counties. **Review rows are never dropped**;
+mention their count and reasons to the user. Condo-heavy counties legitimately
+send many rows to review; the script only warns when >30% fail for
+*unexpected* reasons — if it warns, stop and investigate.
+
+### Stage 2b — subdivision lookup (lookup counties only)
+
+For each name in `lookups.txt`, run the appraiser's subdivision/sub-condo
+search in the browser (Pinellas: Quick Search → "Sub/Condo" mode). **Recorded
+names may be word-reordered vs the appraiser's names** ("EDGEWATER SECTION OF
+SHORE ACRES" is filed as "SHORE ACRES EDGEWATER SEC") — if a name returns
+nothing, try reordered/shortened variants; that judgment is yours. Save all
+result rows as `work/subdivisions.json`:
+`{ "<name as it appears in lookups.txt>": [{"pid": "...", "legal": "..."}] }`
+— then:
+
+```
+python ${CLAUDE_SKILL_DIR}/scripts/run_pipeline.py match \
+    --parsed work/parsed.json --subdivisions work/subdivisions.json --out work/
+```
+
+Matching is strict (exact lot token + block agreement + exactly one
+candidate); unmatched records ship unenriched rather than mis-joined.
 
 ## Stage 3 — Enrich from the appraiser (browser)
 
-For each parcel ID in `parsed.json`, fetch the county appraiser record using
-the `appraiser` entry in `counties.json`. These are plain GET URLs, so
-**navigate the browser to each URL and read the JSON shown on the page** —
-no scripting required (Brevard: exact lookup
-`https://www.bcpao.us/api/v1/search?parcel=<id>` to get the account number,
-then `https://www.bcpao.us/api/v1/account/<account>` for the full record with
-mailing address and sales history). Serial navigation, ~1–2s apart.
+For each parcel ID in `work/parcel_ids.txt`, fetch the county appraiser
+record per the `appraiser` entry in `counties.json` and record it in the
+**normalized parcel contract** — the shape `enrich.py` consumes for every
+county:
+
+```json
+{"siteAddress": "…", "owner": "…",
+ "mailingAddress": {"addr1": "…", "city": "…", "state": "…", "isForeign": false},
+ "saleInfo": "MM/DD/YYYY …", "propertyUse": {"description": "…"},
+ "marketValue": "…"}
+```
+
+- **Brevard (JSON API):** navigate to
+  `https://www.bcpao.us/api/v1/search?parcel=<id>` (read the account number),
+  then `https://www.bcpao.us/api/v1/account/<account>` — the response already
+  IS the contract shape (a superset).
+- **Pinellas (page-read):** open
+  `https://www.pcpao.gov/property-details?s=<strap>` — the strap is the
+  parcel ID with its first three segments REVERSED, then concatenated without
+  dashes (verified: `28-30-16-71496-001-0040` → `163028714960010040`); the
+  subdivision search results also link each parcel's details page directly.
+  Read Owner Name,
+  Site Address, Mailing Address, most recent sale date, and Property Use off
+  the page into the contract yourself.
+
+Serial navigation, ~1–2s apart.
 
 Collect results into `work/parcels.json` as `{ "<parcelID>": <account JSON> }`.
 **Only an exact single match (`totalCount: 1`) counts.** Zero matches OR
