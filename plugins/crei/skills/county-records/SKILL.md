@@ -135,8 +135,11 @@ then `https://www.bcpao.us/api/v1/account/<account>` for the full record with
 mailing address and sales history). Serial navigation, ~1–2s apart.
 
 Collect results into `work/parcels.json` as `{ "<parcelID>": <account JSON> }`.
-A parcel that returns 0 matches goes in with value `null` — the scorer flags
-it for review instead of dropping it.
+**Only an exact single match (`totalCount: 1`) counts.** Zero matches OR
+multiple matches (e.g. a subdivided lot — `…-85` matching 85, 85.01, 85.02…,
+common when the legal description has a `BEG @`/`FROM` partial-lot fragment)
+go in as `null` — the scorer ships those leads unenriched and flagged rather
+than risking a wrong join.
 
 ## Stage 4 — Score
 
