@@ -1,0 +1,48 @@
+{
+  "_comment": "Per-county portal + parcel config. NOTHING county-specific lives in code. verified=true means the parcel-ID construction was confirmed against that county's appraiser on 3+ real records.",
+  "brevard-fl": {
+    "displayName": "Brevard County, FL",
+    "vendor": "acclaim",
+    "regime": "open",
+    "landingUrl": "https://vaclmweb1.brevardclerk.us/AcclaimWeb/",
+    "basePathHint": "/AcclaimWeb",
+    "docTypes": {
+      "lis_pendens": ["LP", "LP1"]
+    },
+    "parcelId": {
+      "format": "{T}-{R}-{S}-{SUBID}-{BLK}-{LOT}",
+      "noBlockToken": "*",
+      "zeroPad": false,
+      "verified": true,
+      "verifiedDate": "2026-08-23",
+      "verifiedSamples": 6
+    },
+    "appraiser": {
+      "name": "BCPAO",
+      "type": "json-api",
+      "searchUrl": "https://www.bcpao.us/api/v1/search?parcel={parcelId}",
+      "accountUrl": "https://www.bcpao.us/api/v1/account/{account}",
+      "notes": "search returns [{totalCount, account, parcelID, siteAddress, subdivisionName, ...}]; exact match has totalCount 1. account endpoint adds owner, mailingAddress, saleInfo/sales history, marketValue, parsed parcel components."
+    }
+  },
+  "pinellas-fl": {
+    "displayName": "Pinellas County, FL",
+    "vendor": "acclaim",
+    "regime": "open",
+    "landingUrl": "https://officialrecords.mypinellasclerk.gov/",
+    "basePathHint": "/",
+    "docTypes": {
+      "lis_pendens": ["LIS PENDENS"]
+    },
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "Portal flow verified (prior recon, 64-row CSV export). Parcel-ID construction NOT yet verified - do not ship enriched leads until it is."
+    },
+    "appraiser": {
+      "name": "PCPAO",
+      "type": "unknown",
+      "notes": "To be mapped during Pinellas verification."
+    }
+  }
+}

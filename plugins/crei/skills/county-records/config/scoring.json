@@ -1,0 +1,48 @@
+{
+  "_comment": "Weighted, explainable lead scoring. Each signal that fires contributes its weight (times any multiplier) to the score; leads.csv shows every contribution. Edit weights freely - scripts never hardcode them.",
+  "signals": {
+    "lis_pendens": {
+      "weight": 40,
+      "description": "A lis pendens was recorded against the property",
+      "recencyMultipliers": [
+        { "maxAgeDays": 7, "multiplier": 1.0 },
+        { "maxAgeDays": 30, "multiplier": 0.8 },
+        { "maxAgeDays": 90, "multiplier": 0.5 },
+        { "maxAgeDays": 99999, "multiplier": 0.3 }
+      ]
+    },
+    "cc_case": {
+      "weight": 20,
+      "description": "County Civil (-CC-) case: HOA/condo lien, small dollar amount against a (typically) high-equity owner; low investor competition"
+    },
+    "association_plaintiff": {
+      "weight": 10,
+      "description": "Plaintiff is an HOA/condo/community association (name contains ASSN/ASSOCIATION/HOA/CONDOMINIUM)"
+    },
+    "absentee_owner": {
+      "weight": 15,
+      "description": "Owner mailing address differs from the property's site address"
+    },
+    "out_of_state_owner": {
+      "weight": 10,
+      "description": "Owner mailing address is outside the property's state"
+    },
+    "entity_owned": {
+      "weight": 5,
+      "description": "Owner is an entity (LLC/INC/TRUST/CORP), not an individual"
+    },
+    "long_tenure": {
+      "weight": 10,
+      "description": "Owner has held the property a long time (equity proxy)",
+      "minYears": 10
+    },
+    "vacant_land_flag": {
+      "weight": 0,
+      "description": "Property use indicates vacant land - informational column only by default; raise the weight if vacant parcels are a target"
+    },
+    "provisional_record": {
+      "weight": 0,
+      "description": "Record flagged U (recorded, not yet released) - informational; re-check after release"
+    }
+  }
+}
