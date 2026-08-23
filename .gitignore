@@ -1,0 +1,12 @@
+# Pulled county records and any files naming individuals (PII) — never commit
+data/
+output/
+*.csv
+!tests/fixtures/**/*.csv
+
+# Local scratch
+*.log
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
