@@ -2,6 +2,7 @@
   "_comment": "Per-county portal + parcel config. NOTHING county-specific lives in code. verified=true means the parcel-ID construction was confirmed against that county's appraiser on 3+ real records.",
   "brevard-fl": {
     "displayName": "Brevard County, FL",
+    "state": "FL",
     "vendor": "acclaim",
     "regime": "open",
     "landingUrl": "https://vaclmweb1.brevardclerk.us/AcclaimWeb/",
@@ -27,6 +28,7 @@
   },
   "pinellas-fl": {
     "displayName": "Pinellas County, FL",
+    "state": "FL",
     "vendor": "acclaim",
     "regime": "open",
     "landingUrl": "https://officialrecords.mypinellasclerk.gov/",
