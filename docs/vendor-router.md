@@ -17,6 +17,9 @@ county, tell the user upfront whether the pipeline can run there.
 | Tyler Eagle | `countygovernmentrecords.com` domains; Tyler footer | (prior recon) **login-gated** |
 | GovOS Cloud Search (Kofile→GovOS→Neumo) | Host `{county}.{st}.publicsearch.us`; title "Official Record Search - Quick Search - …"; "Powered By Neumo" footer; "Certified through" banner; Quick/Advanced tabs, OCR full-text option, "Property Alert" | Dallas, Tarrant, Bexar, Collin, Denton, Hidalgo, Cameron — all TX, all open (2026-08-24). **No handler yet** |
 | Aumentum Recorder – Public Access (Harris) | Footer "Aumentum Recorder - Public Access Web UI, Version 20xx.x.x … Harris Recording Solutions"; disclaimer + accept; `/RealEstate/SearchEntry.aspx` paths | Alachua FL; Travis TX (`tccsearch.org`), Fort Bend TX (`ccweb.co.fort-bend.tx.us`) — all Version 2023.1.2, open (2026-08-24). **No handler yet** |
+| GSCCCA (GA statewide consortium) | `search.gsccca.org`, classic ASP paths, © GSCCCA footer, 159-county picker; forms anonymous but search execution → `apps.gsccca.org/login.asp` | Fulton, Gwinnett, Clayton, Chatham, Hall GA (only online route; **Gated/Paid** $5/4hr — login wall hit live 2026-08-24). User-assisted only |
+| Cott Systems eSearch | "eSearch \| Name Search" title, Guest User header, © Cott Systems footer; `cotthosting.com` variants gated | Forsyth GA (open as guest, 2026-08-24); Henry GA legacy (gated). **No handler yet** |
+| Tyler "RE Search" (MicroPact) | "RE Search" title, `/RESearch/RESearch` path, © Tyler Technologies v1.x footer, per-class Good-Thru dates | Henry GA (open, free; 2026-08-24). **No handler yet** |
 | Custom in-house | anything else — e.g. Manatee's "Public Records Hub" (MCCCC); Harris Co. TX "Web Inquiry" (`cclerk.hctx.net`); El Paso TX (`apps.epcountytx.gov/publicrecords`) | Manatee; Harris TX, El Paso TX (open, 2026-08-24) |
 
 ## Step 2 — access regime (per deployment)

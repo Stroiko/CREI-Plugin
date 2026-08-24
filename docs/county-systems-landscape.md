@@ -19,17 +19,19 @@ entries were verified earlier by us (2026-08-23, see `data-sources.md` /
 | **Acclaim v2** (guest UI) | same | "Welcome, Guest" header, Kendo widgets, no disclaimer gate, `Copyright 1999–20xx Harris Recording Solutions` | GT (Highlands, St. Lucie) |
 | **Landmark Web** (Pioneer Technology Group) | **Catalis** (formerly Government Brands LLC — PE rollup of 30+ govtech cos., rebranded Aug 2022 ([govtech.com](https://www.govtech.com/biz/after-30-acquisitions-government-brands-rebrands-as-catalis)); ptghome.com now redirects to catalisgov.com/courts-land-records/ — VERIFIED 2026-08-24). PTG HQ Sanford, FL; sister product Benchmark (courts) | Page title `Landmark Web Official Records Search` or `Landmark Web Home Page`; URL path `/LandmarkWeb` (also `/Landmark`, case-insensitive `/LandMarkWeb`); nav: Home/Search/Support + "Subscriber Log On"; tiles: Name, Document, Case Number, Book Page, Consideration, Record Date, Clerk File Number, Legal; "Property Fraud Alert" at `/LandmarkWeb/FraudAlert` | VERIFIED (Lee, Palm Beach, Escambia, St. Johns, Clay, Hernando) |
 | **Tyler Eagle** recorder | Tyler Technologies (acquired Eagle Computer Systems) | `countygovernmentrecords.com` hosted network (footer "© Tyler Technologies Inc.") — hosts NM, PA, TX, WA only (VERIFIED 2026-08-24); standalone deployments use `/recorder/eagleweb/` JSP paths; public product now "[Records Public Access](https://www.tylertech.com/solutions/public-administration/land-official-records/records-management)" | VERIFIED (network landing) — **login-gated** for doc search (GT prior recon) |
+| **Tyler "RE Search"** (MicroPact platform) | Tyler Technologies (acquired MicroPact 2019) — third Tyler recorder product after Eagle and Self-Service | Title `RE Search`; path `/RESearch/RESearch`; footer `© 20xx Tyler Technologies v1.x.x.x`; host often `micropact.{county domain}`; "Good Thru Date" per record class (Deeds/Liens/Plats); search-by nav Name / Book-Page / Land Description / Instrument Type / Cross-Reference / Image; optional free account for fraud notifications only | VERIFIED (Henry GA — **open**, disclaimer states "no charge") |
 | **NewVision BrowserView / SearchNG** | NewVision Systems Corporation, New Canaan CT (independent; [newvisionsystems.com](https://webhost01.newvisionsystems.com/officialrecords.aspx)) | BrowserView: URL path `/browserview*`, footer `© 2018 NewVision Systems Corporation. All rights reserved`, banner "Verified as of MM/DD/YYYY", tabs Search/Results/Document, sub-tabs Party / Document Type / File Number / Book-Page. SearchNG (legacy): `nvweb.` host, launches a **ClickOnce Windows app** — not browser-automatable | VERIFIED (Polk, Osceola = BrowserView; Marion = SearchNG) |
 | **Aumentum Recorder — Public Access** | Harris Computer since 18-Nov-2019; formerly Thomson Reuters Aumentum, originally Manatron ([pitchbook](https://pitchbook.com/profiles/company/436305-52), [Harris announcement](https://www.harrisfrontline.com/post/harris-announces-aumentum)) | ASP.NET variant: path `/RealEstate/SearchEntry.aspx`, footer `Aumentum Recorder - Public Access Web UI, Version 20xx.x.x Copyright © 2001 - 20xx`. JSP variant: path `/recorder/web/`, "Version: 20xx.1.xx" banner, disclaimer + "I Accept", help at `web/help.jsp` with `$ ? + - *` wildcard-operator help text | VERIFIED (Alachua FL, Travis TX, Fort Bend TX = ASP.NET, all on Version 2023.1.2) |
 | **OnCore** (Aptitude Solutions) | Harris (same Aptitude lineage as Acclaim). Legacy product; deployments migrating to Acclaim (Duval's `oncore.duvalclerk.com` now 301s to an Acclaim portal — VERIFIED) | ASP.NET `.aspx` pages (`ORWelcome.aspx`, `OfficialRecords.aspx`); header shows `User Name - Anonymous / Group - Public Access` | VERIFIED portal (Sarasota); vendor ID from UI pattern = REPORTED |
 | **Kofile → GovOS → Neumo** — **GovOS Cloud Search** (live OR index; internally "Vanguard Search" — NOT Tyler's "Vanguard CI") + "QuickLink" (historic books) | Audax PE bought Kofile Technologies 2020; software arm became **GovOS** (Austin, TX), **spun out of Kofile 2023**; Audax sold GovOS to **Neumo** Aug 2025 ("700+ government agencies") ([Audax/LinkedIn](https://www.linkedin.com/posts/audax-private-equity_were-thrilled-to-announce-the-sale-of-govos-activity-7361439161477660673-6JjF), [press PDF](https://sheaco.com/wp-content/uploads/2025/08/Audax-Private-Equity-Completes-Exit-of-GovOS.pdf)). Kofile itself continues as records preservation/digitization services | **Cloud Search**: host `{county}.{st}.publicsearch.us`; title `Official Record Search - Quick Search - {County}, {State} {office}`; footer "Powered By **Neumo**" logo; "Certified through MM/DD/YYYY" banner; workspace-tab SPA with Quick/Advanced search, department picker, Index-vs-Full-Text-(OCR) radio, "Property Alert" fraud alert, Cart/Register (optional). **QuickLink**: `kofilequicklinks.com/{county}{st}/Default.aspx`, title "QuickLink - {County}"; table-layout ASP.NET, "Search Index Books" / "Search for a Document" panels — **historical index books only**, not the live OR index; often cross-links its county's Cloud Search | VERIFIED — Cloud Search (Cameron, Dallas, Tarrant, Bexar, Collin, Denton, Hidalgo — all TX); QuickLink (Polk FL, Cameron TX historic books) |
 | **Fidlar Technologies** — Laredo / Tapestry | Independent (Davenport, IA — [fidlar.com](https://www.fidlar.com/CompanyInfo.aspx)) | Tapestry: `tapestry.fidlar.com/TapestryEON/...` central multi-county site, **pay-per-search**; Laredo: installed/subscription client, per-county. County sites say "search in all Fidlar counties" ([example: Lyon Co. KS](https://www.lyoncountyks.gov/246/Register-of-Deeds-Records-Search)) | VERIFIED (vendor + county pages); Midwest (MN, WI, IL, IN, MI, KS...) — no FL seen |
-| **Cott Systems** — Resolution³ / records online | Independent (Columbus, OH; 135+ yrs) | Hosted per-county portals (`cotthosting.com` etc.); vendor claim "**over 300 local offices across 21 states**" ([cottsystems.com](https://cottsystems.com/), VERIFIED claim 2026-08-24) | REPORTED footprint; no FL deployment seen |
+| **Cott Systems** — Resolution³ / eSearch | Independent (Columbus, OH; 135+ yrs) | **eSearch (live)**: title `eSearch \| Name Search`; path `/External/LandRecords/protected/SrchQuickName.aspx`; "Guest User" header with optional "Log in as named user"; footer `© 2007 - 20xx Cott Systems, Inc. Version 1.x.x.x`; hosted on county subdomain (`resolution.{county}.com`) or `cotthosting.com/{st}{county}` (the cotthosting deployments land on `User/Login.aspx` = gated). Vendor claim "**over 300 local offices across 21 states**" ([cottsystems.com](https://cottsystems.com/)) | VERIFIED live (Forsyth GA — open as guest); cotthosting variant seen gated (Henry GA legacy) |
 | **DuProcess®** (Alliance) | Alliance ([courtalliance.com/software](https://courtalliance.com/software)) — small FL/MS vendor | Title `DuProcess® Official Records Online`; path `/DuProcessWebInquiry/` | VERIFIED (Seminole FL; MS chancery clerks) |
 | **i3 Verticals** — Land Records / TitleSearcher (ex-BIS) | i3 Verticals (public co., Nashville); land records line from Business Information Systems (BIS) | `titlesearcher.com` multi-county search, footer `©1999-2026 Business Information Systems`; states AR, TN, KY, VA, NC, SC; **membership/paid** | VERIFIED landing |
 | **US Land Records** network | Historically ACS/Xerox-lineage hosted network; landing says "Welcome LandAccess.com users" (LandAccess was Manatron/Aumentum's), current operator not named on site | `uslandrecords.com/uslr/UslrApp/index.jsp`; state picker (CT, DE, MA, ME, MI, NJ, NY, OH, OK, PA, RI, SC, TX, VT, VA); per-state subdomains (`sclandrecords.com`, `i2e.uslandrecords.com/...`) | VERIFIED landing; ownership REPORTED/unclear — no FL |
 | **Vanguard CI** | Site title "Home \| Tyler Technologies \| Vanguard CI" — Tyler-affiliated recorder-office product line. **Name collision:** GovOS internally calls its Cloud Search "Vanguard Search" (seen in QuickLink nav) — unrelated product | Niche; "Recording Access" public request module | REPORTED only — not seen in FL |
 | **Granicus govRecords** | Granicus | Marketing page only ([granicus.com](https://granicus.com/)) — no live portal fingerprinted | REPORTED only |
+| **GSCCCA** — Georgia Superior Court Clerks' Cooperative Authority | State-created cooperative of all 159 GA clerks (statute O.C.G.A. 15-6-97/98) — **new category: statewide consortium**, not a commercial vendor. First seen 2026-08-24 (GA sweep) | Host `search.gsccca.org`; classic ASP paths (`/RealEstate/namesearch.asp`, `/Lien/lienindex.asp`, `/plat/...`, `/pt61/...`); footer `Copyright © 1995 - 20xx Georgia Superior Court Clerks' Cooperative Authority`; statewide county picker (all 159 + All Counties + neighboring-county option); instrument types incl. LIEN, DEED - FORECLOSURE, TAX SALE DEED; "PREMIUM"-labeled searches. **Search forms load anonymously but executing ANY search bounces to `apps.gsccca.org/login.asp`** — account + payment required ($5/4hr day pass per county references; subscriptions) | VERIFIED (login wall hit live on Fulton name search, 2026-08-24) — **Gated/Paid** |
 | **Custom in-house** | per county | Anything else. FL examples: Miami-Dade SPA, Hillsborough "ORI Public Access" SPA, Volusia legacy `.aspx` "Document Inquiry", Pasco classic `.asp` forms, Leon `lforms` form, Collier "COR Access" SPA, Manatee "Public Records Hub" (GT) | VERIFIED (each below) |
 
 ## 2. Florida county-by-vendor (top 25+ by population)
@@ -113,14 +115,47 @@ guessable URL pattern (`{county}.tx.publicsearch.us`) that resolves before you
 even search.** The FL§1 fingerprints classified all 11 TX counties with zero
 new vendor rows needed.
 
-## 4. National footprint (vendor claims — treat as marketing numbers)
+## 4. Georgia county-by-vendor (top 10 by population)
+
+All VERIFIED live 2026-08-24 (same standard as FL/TX; one search-execution test
+on GSCCCA to resolve conflicting regime evidence — stopped at the login wall,
+nothing entered). GA structural difference: deeds/liens are recorded with the
+**Clerk of Superior Court**, and the state runs a mandatory statewide index
+(GSCCCA). Counties without their own portal route the public there.
+
+| # | County | Vendor | URL | Evidence / notes |
+|---|---|---|---|---|
+| 1 | Fulton | **GSCCCA** (statewide) | via `search.gsccca.org` | County site routes to GSCCCA ("$5 fee for 4 hours of access"); county eServices is filing-oriented. **Gated/Paid** |
+| 2 | Gwinnett | **GSCCCA** (statewide) | via `search.gsccca.org` | County deeds FAQ routes to gsccca.org; no county-run OR portal found. Gated/Paid |
+| 3 | Cobb | **Landmark Web** | `superiorcourtclerk.cobbcounty.gov/landmark` | Title "Landmark Web Home Page" — exact fingerprint; path-mounted variant. Legacy "Web Public Inquiry" at `research.cobbsuperiorcourtclerk.com` frozen at 10/01/2024 (Landmark migration). Open |
+| 4 | DeKalb | **Landmark Web** | `deeds.dekalbcountyga.gov/LandmarkWeb` | Title "Landmark Web Official Records Search" — exact fingerprint. Open |
+| 5 | Clayton | **GSCCCA** (statewide) | via `gsccca.org/search` | County Real Estate Division page: "Real Estate Document Search 1985 – Current" links to gsccca.org/search. Gated/Paid |
+| 6 | Chatham | **GSCCCA** (statewide) | via `gsccca.org` | Superior Court Clerk Real Estate pages route to gsccca.org; in-person terminals otherwise. Gated/Paid |
+| 7 | Cherokee | **Landmark Web** | `deeds.cherokeega.com/LandmarkWeb` | Title match — exact fingerprint; confirms the 2022 Catalis GA-expansion note (§5). Open |
+| 8 | Forsyth | **Cott Systems eSearch** | `resolution.forsythco.com` | First live Cott: title "eSearch \| Name Search", footer "© 2007 - 2026 Cott Systems, Inc. Version 1.7.29.15", "Guest User" + optional named-user login. **Open as guest** — contradicts Cott's registration-typical rep. County disclaimer page at forsythclerk.com links in |
+| 9 | Henry | **Tyler "RE Search"** (MicroPact) | `micropact.co.henry.ga.us/RESearch/RESearch` | Footer "© 2026 Tyler Technologies v1.1.7.0"; disclaimer: "no charge for this access"; Good-Thru dates Deeds 08/18 / Liens 08/19/2026. **Open.** Legacy gated Cott portal at `cotthosting.com/gahenry/User/Login.aspx` still resolves |
+| 10 | Hall | **GSCCCA** (statewide) | via `gsccca.org/search` | hallclerk.com Real Estate pages route to gsccca.org (account required). Gated/Paid |
+
+**GA tally (10 counties established):** GSCCCA statewide 5 (Fulton, Gwinnett,
+Clayton, Chatham, Hall — all Gated/Paid) · Landmark Web 3 (Cobb, DeKalb,
+Cherokee — all open) · Cott eSearch 1 (Forsyth — open) · Tyler RE Search 1
+(Henry — open) · Unknown vendors: 0, but **GSCCCA is a new system category**
+(statewide consortium) and Cott + Tyler RE Search are first live fingerprints
+for previously reported-only products.
+
+**Georgia's trend twist: half the top 10 has NO open county portal — the
+statewide GSCCCA consortium is the only online route, and it's paywalled.
+The other half is business as usual: Landmark (shipped handler!) took the
+big suburban counties, and every county-run portal we touched is open.**
+
+## 5. National footprint (vendor claims — treat as marketing numbers)
 
 | Rank (approx.) | Vendor | Claimed footprint | Source |
 |---|---|---|---|
 | 1 | Tyler Technologies (Eagle / Records Public Access) | Largest govtech vendor overall; Eagle recorder concentrated in the West/Southwest; hosted search network covers NM, PA, TX, WA | [countygovernmentrecords.com](https://www.countygovernmentrecords.com/) (VERIFIED landing); [tylertech.com](https://www.tylertech.com/solutions/public-administration/land-official-records/records-management) |
 | 2 | GovOS (ex-Kofile software) → Neumo | "More than 700 government agencies" (all products, not just land records). **TX dominance confirmed by our sweep**: 7 of 11 established TX counties on Cloud Search | [Audax exit press, Aug 2025](https://sheaco.com/wp-content/uploads/2025/08/Audax-Private-Equity-Completes-Exit-of-GovOS.pdf); §3 sweep 2026-08-24 |
 | 3 | Fidlar (Laredo/Tapestry) | Multi-state Midwest network; "all Fidlar counties" searchable from one Tapestry site (MN, WI, IL, IN, MI, KS seen); no exact count published on fidlar.com | [fidlar.com](https://www.fidlar.com/); [Lyon Co. KS](https://www.lyoncountyks.gov/246/Register-of-Deeds-Records-Search) |
-| 4 | Cott Systems | "over 300 local offices across 21 states" | [cottsystems.com](https://cottsystems.com/) |
+| 4 | Cott Systems | "over 300 local offices across 21 states"; first live deployment fingerprinted 2026-08-24 (Forsyth GA eSearch) | [cottsystems.com](https://cottsystems.com/); §4 sweep |
 | 5 | Catalis (Pioneer Landmark + Benchmark + more) | 30+ companies rolled up; Landmark dominant in FL, expanding (Cherokee Co. GA, Adams Co. CO, Seattle WA wins) | [govtech.com](https://www.govtech.com/biz/after-30-acquisitions-government-brands-rebrands-as-catalis); [ptghome.com](https://www.ptghome.com/) (→ catalisgov.com) |
 | 6 | Harris (HRS Acclaim + Aumentum + OnCore legacy) | FL-dominant on Acclaim; Aumentum adds large-county recorder deployments nationally (ex-Thomson Reuters book) | [PRWeb](https://www.prweb.com/releases/harris_recording_solutions_announces_acclaim_upgrade/prweb11929075.htm); [pitchbook](https://pitchbook.com/profiles/company/436305-52) |
 | 7 | i3 Verticals / BIS (TitleSearcher) | AR, TN, KY, VA, NC, SC counties | [titlesearcher.com](https://www.titlesearcher.com/) |
@@ -130,7 +165,7 @@ new vendor rows needed.
 No independent, current per-county census exists; these are the best sourced
 claims as of 2026-08-24.
 
-## 5. Access regime + export capability per vendor
+## 6. Access regime + export capability per vendor
 
 Never auto-register or enter payment anywhere (router rule). Regime is
 **per-deployment** — vendor is a prior, not a guarantee.
@@ -149,11 +184,13 @@ Never auto-register or enter payment anywhere (router rule). Regime is
 | Tyler Eagle | **Gated** — document search requires account (GT prior recon); Tyler markets subscription "Records Public Access" | n/a for us | Skip (also: no FL) |
 | Fidlar Laredo / Tapestry | **Paid** — Laredo subscription; Tapestry pay-per-search with account | n/a for us | Skip (also: no FL) |
 | i3/BIS TitleSearcher | **Paid** membership | n/a | Skip |
-| Cott | Mixed; typically registration, some paid images | Unknown | Skip until a target county appears |
+| Cott eSearch | **Open as guest** at Forsyth GA (named-user login optional); `cotthosting.com` deployments seen gated (Henry GA legacy) — regime per-deployment | Unknown; ASP.NET postback UI, results untested | Single GA top-10 county so far; revisit if more Cott counties appear |
+| Tyler RE Search (MicroPact) | **Open** — "no charge" per county disclaimer; free account only for fraud alerts | Unknown; has per-class Good-Thru dates | Single county (Henry GA) so far |
+| GSCCCA (GA statewide) | **Gated/Paid** — forms load anonymously, search execution bounces to login; $5/4hr day pass or subscription | n/a for us (never pay/register) | Covers ALL 159 GA counties incl. 5 of top 10 with no county alternative. User-assisted route only: user logs into their own GSCCCA account, we drive the search after |
 | Kofile/GovOS QuickLink | **Open** (Polk) | Index-book images only — not a lead source | Not useful for pipeline |
 | US Land Records | Free index search typical, paid images | Unknown | No FL; revisit for Northeast expansion |
 
-## 6. Recommended handler build order (re-ranked 2026-08-24 with TX sweep)
+## 7. Recommended handler build order (re-ranked 2026-08-24 with TX sweep)
 
 Shipped so far: **Acclaim** (Brevard pipeline), **Landmark Web** (Palm Beach
 verified 3/3), **NewVision BrowserView** (Polk verified 3/3), **Tyler
@@ -176,13 +213,20 @@ Self-Service** (Orange verified 3/3) — see vendor-router capability matrix.
    (OnCore-style) fits here too.
 4. **Remaining Landmark/NewVision counties** — extend shipped handlers'
    capability rows: Lee (Akamai interstitial — user-assisted), St. Johns, Clay,
-   Hernando, Escambia; Osceola (BrowserView, expected identical to Polk).
+   Hernando, Escambia; Osceola (BrowserView, expected identical to Polk);
+   **GA: Cobb (#3), DeKalb (#4), Cherokee (#7)** — the shipped Landmark handler's
+   cheapest new-state expansion (verify per-county capability rows, GA legals are
+   land-lot/district style so join strategies need GA appraiser mapping).
 5. **DuProcess (Seminole)** — single FL county, JS app; do when Seminole matters.
-6. **Skip for now:** Tyler Eagle (gated; TX presence is small-county via
-   `countygovernmentrecords.com`), Fidlar (paid), TitleSearcher (paid), Cott /
+6. **Skip for now:** GSCCCA (gated/paid — the only route for 5 of GA's top 10;
+   revisit as a **user-assisted** flow where the user logs into their own
+   account first), Tyler Eagle (gated; TX presence is small-county via
+   `countygovernmentrecords.com`), Fidlar (paid), TitleSearcher (paid),
    US Land Records / Vanguard CI / Granicus (no footprint in our states).
-   Charlotte FL's unidentified portal: fingerprint again when a handler pass
-   reaches it. QuickLink historic books: not a lead source.
+   Cott eSearch (Forsyth GA) + Tyler RE Search (Henry GA): open but one county
+   each — build when those counties matter. Charlotte FL's unidentified portal:
+   fingerprint again when a handler pass reaches it. QuickLink historic books:
+   not a lead source.
 
 With GovOS + Aumentum shipped, vendor-level coverage would span **17 of FL's 30
 established counties (incl. 8 of top 10) and 9 of TX's 11 established counties
