@@ -4,6 +4,9 @@ output/
 *.csv
 !tests/fixtures/**/*.csv
 
+# Secrets - never commit
+.env
+
 # Local scratch
 *.log
 .venv/
