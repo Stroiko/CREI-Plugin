@@ -37,6 +37,9 @@ Just ask Claude things like:
 
 > "Check Zillow for new foreclosure listings in Orlando under $400k."
 
+> "What's the monthly cash flow on 123 Example St at asking price with 20%
+> down at 7%? Show me the Section 8 case too."
+
 Claude will drive the county records portal in your Chrome, export the
 filings, construct/lookup each property's parcel, pull ownership data from
 the county appraiser, and give you a ranked CSV + summary. Expect a full
@@ -49,6 +52,8 @@ politely against government websites.
 |---|---|
 | `county-records` | The lead pipeline: county distress filings → parcel join → ownership signals → explainable scoring |
 | `zillow` | Zillow search & property detail extraction: listings, foreclosures, FSBO, rent estimates |
+| `hud-fmr` | HUD Fair Market Rent (Section 8) lookup by ZIP/county from huduser.gov, incl. ZIP-level Small Area FMRs |
+| `rental-cashflow` | Monthly cash flow + DSCR under multiple rent scenarios (Zillow Rent Zestimate, HUD FMR, your own number), self-managed and property-managed side by side, every assumption explained |
 
 ## County coverage (v1)
 
@@ -86,7 +91,7 @@ Repo layout: `.claude-plugin/marketplace.json` (marketplace manifest) →
 Pipeline code is stdlib-only Python 3 — no pip installs, by design.
 
 ```
-python -m pytest tests/          # 54 tests; fixtures are real county records
+python -m pytest tests/          # fixtures are real county records + live HUD FMR values
 ```
 
 Design docs: [docs/data-sources.md](docs/data-sources.md),
