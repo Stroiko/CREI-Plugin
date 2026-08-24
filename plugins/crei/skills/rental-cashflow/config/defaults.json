@@ -1,0 +1,36 @@
+{
+  "_comment": "Every assumption the cashflow calculator uses. Edit freely - scripts never hardcode these.",
+  "vacancy_pct": 0.05,
+  "management": {
+    "self_managed_pct": 0.0,
+    "managed_pct": 0.10,
+    "typical_range": [0.08, 0.10]
+  },
+  "insurance": {
+    "pct_of_rent": 0.05,
+    "_note": "used only when insurance_monthly is not provided; overridable with a real quote"
+  },
+  "property_tax": {
+    "fallback_annual_pct_of_price": 0.011,
+    "_note": "used ONLY when property_tax_monthly is absent; always prefer the real county figure"
+  },
+  "maintenance_pct_by_age": [
+    {"maxAgeYears": 10, "pct": 0.05},
+    {"maxAgeYears": 30, "pct": 0.075},
+    {"maxAgeYears": 9999, "pct": 0.10}
+  ],
+  "capex_pct_by_age": [
+    {"maxAgeYears": 10, "pct": 0.05},
+    {"maxAgeYears": 30, "pct": 0.075},
+    {"maxAgeYears": 9999, "pct": 0.10}
+  ],
+  "loan": {
+    "term_years": 30
+  },
+  "dscr": {
+    "method": "noi",
+    "_method_note": "noi = NOI / annual debt service (capex excluded unless toggled). rent_over_pitia = gross rent / (P&I + tax + insurance + HOA), the DSCR-lender convention Kevin's app uses (shows 2.12).",
+    "include_capex_in_noi": false,
+    "pass_threshold": 1.2
+  }
+}

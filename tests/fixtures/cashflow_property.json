@@ -1,0 +1,25 @@
+{
+  "property": {
+    "address": "123 Example St, Palm Bay, FL 32905",
+    "zip": "32905",
+    "bedrooms": 3,
+    "year_built": 1980,
+    "purchase_price": 89500,
+    "hoa_monthly": null,
+    "property_tax_monthly": 200,
+    "insurance_monthly": null
+  },
+  "financing": {
+    "down_payment": "20%",
+    "interest_rate": 6.5,
+    "interest_only": false,
+    "term_years": 30
+  },
+  "rent_scenarios": [
+    {"label": "user_airv", "rent": 1551},
+    {"label": "hud_fmr_3br", "rent": 2220},
+    {"label": "zillow_rent_zestimate", "rent": 1600}
+  ],
+  "overrides": {},
+  "as_of_year": 2026
+}

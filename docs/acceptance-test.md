@@ -17,7 +17,8 @@ footage.
 
 - [ ] Customize → Plugins → Add → Add Marketplace → paste the repo URL
 - [ ] The CREI plugin appears with name/description rendered correctly
-- [ ] Install it; both skills (`county-records`, `zillow`) are available
+- [ ] Install it; all four skills (`county-records`, `zillow`, `hud-fmr`,
+      `rental-cashflow`) are available
 
 ## Test 2 — Zillow skill alone (fast smoke test)
 
@@ -70,6 +71,25 @@ ambiguous-match rule. Not a blocker for v1 tagging if Test 3 passes.
 - [ ] Ask for a Tyler/gated county (e.g. a countygovernmentrecords.com one):
       plugin says upfront it can't automate it, does NOT attempt registration
 - [ ] Ask for Broward: plugin explains pull-only (no legals on LP docs)
+
+## Test 5 — rental cash flow analysis
+
+Prompt: *"What's the monthly cash flow on \<a real listed address\> at asking
+price with 20% down at 7%? Show me the Section 8 case too."*
+
+- [ ] The `rental-cashflow` skill triggers on the phrasing
+- [ ] Zillow skill invoked for price / beds / year built / Rent Zestimate
+      (not re-scraped ad hoc)
+- [ ] hud-fmr skill invoked; FMR pulled from huduser.gov for the property's
+      county, with the FY year and safmr_zip vs county_fmr source stated
+      (or the scenario skipped with an explicit note)
+- [ ] Claude runs `cashflow.py analyze` (does not hand-compute the breakdown)
+- [ ] Output shows a multi-scenario table with BOTH self-managed and
+      property-managed columns, line items footing to the cash flow
+- [ ] DSCR shown with verdict AND the assumptions list (vacancy, tiers,
+      insurance basis, tax source) — a missing tax figure must be loudly
+      flagged as an estimate
+- [ ] No investment-advice framing; the disclaimer line is present
 
 ## Record the results
 
