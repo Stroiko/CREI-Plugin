@@ -33,6 +33,8 @@ leads. Verified capability matrix:
 | Pinellas, FL | ✓ (23 rows) | ✓ name-based, in `Comments` | subdivision-lookup on PCPAO | **Verified (3/3)**; condos → review |
 | Highlands, FL | ✓ (25 rows) | ✓ `CASE #/abbrev` in `Comments` | owner-lookup + legal cross-check on HCPAO | **Verified (3/3)** |
 | Palm Beach, FL | ✓ (93 rows/wk, XLSX export; reCAPTCHA = 1 human click per search) | ✓ **pre-parsed columns** (Lot/Sub/S-T-R) | owner-lookup on PAPA, cross-check lot+STR | **Verified (3/3)** — 2026-08-24 |
+| Polk, FL | ✓ (79 docs/wk via Print Results TSV; no CAPTCHA) | ✓ sub-first name-based; some legals ARE parcel IDs | owner-lookup on polkflpa.gov + legal cross-check | **Verified (3/3)** — 2026-08-24; no case numbers in data |
+| Osceola, FL | BrowserView identical to Polk; codes LP+LPCT | expected same | expected owner-lookup | Candidate (verify next) |
 | Lee, FL | Landmark confirmed; **Akamai interstitial** before search | expected same as PB | expected owner-lookup (leepa.org) | Blocked pending user-assisted run |
 | St. Johns, FL | Landmark, structure identical to PB | not yet pulled | unmapped | Candidate (verify next) |
 | Broward, FL | ✓ (43 rows) | ✗ empty on LP (0/43) | none from CSV | **Pull-only** — names/cases without parcels |

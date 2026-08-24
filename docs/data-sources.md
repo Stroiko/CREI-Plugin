@@ -111,6 +111,20 @@ guess.
 - PCN decodes as `county(00)-RR-TT-SS-sub-BBB-(lot×10)` — instant cross-check
   from the URL.
 
+### Polk (polkflpa.gov) — VERIFIED 2026-08-24 — owner-lookup join (NewVision county)
+
+- Clerk portal is **NewVision BrowserView** (`apps.polkcountyclerk.net/browserviewor/`) —
+  no CAPTCHA; ingest via the Print Results page (tab-delimited, full legals,
+  `*` = plaintiff row). 79 unique documents in one week; 74/79 parsed
+  (4 were direct parcel IDs — instant joins); lis pendens codes `LP` + `L PEN`.
+- Appraiser **moved domains: polkpa.org → polkflpa.gov**. Owner search
+  `#searchRE_name` on `/CamaSearch.aspx`; details at
+  `/CamaDisplay.aspx?...&ParcelID=<id>` with Subdivision, Mailing Address,
+  Sales History.
+- Join verified 3/3 (incl. a two-parcel LLC disambiguated by the lot tail —
+  parcel tail encodes lot×10).
+- Data gap: no case numbers in the clerk grid → `cc_case` signal unavailable.
+
 ### Broward — PULL-ONLY (verified 2026-08-23)
 
 Acclaim export works (43 rows) but 0/43 lis pendens carried a legal

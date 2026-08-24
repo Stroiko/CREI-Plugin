@@ -155,6 +155,37 @@ def parse_legal_namebased(legal: str) -> Union[ParsedNameLegal, ReviewRecord]:
 
 # Case numbers never contain '/', so split at the FIRST slash - legals often do
 # ("L8/9 BLK A ...").
+_SF_LOT = re.compile(r"\b(?:LT|UN)\s+(\d+[A-Z]?)")
+_SF_BLK = re.compile(r"\bBLK\s+([A-Z0-9][A-Z0-9.]*)\b")
+_SF_FIRST_TOKEN = re.compile(r"\b(?:BLK\s+[A-Z0-9]|(?:LT|UN)\s+\d)")
+
+
+def parse_legal_subfirst(legal: str) -> Union[ParsedNameLegal, ReviewRecord]:
+    """Parse subdivision-first name-based legals (NewVision style):
+    '{SUBDIVISION NAME} [BLK b] LT l [trailing refs]'."""
+    raw = (legal or "").strip()
+    text = re.sub(r"\s+", " ", raw.upper())
+    if not text:
+        return ReviewRecord("empty", raw)
+
+    lot_m = _SF_LOT.search(text)
+    if not lot_m:
+        return ReviewRecord("missing_fields", raw, detail="missing: lot")
+
+    first = _SF_FIRST_TOKEN.search(text)
+    subdivision = text[:first.start()].strip(" .,-")
+    if not subdivision:
+        return ReviewRecord("missing_fields", raw, detail="missing: subdivision name")
+
+    blk_m = _SF_BLK.search(text)
+    return ParsedNameLegal(
+        lot=lot_m.group(1),
+        block=blk_m.group(1) if blk_m else None,
+        subdivision=subdivision,
+        raw=raw,
+    )
+
+
 _CC_SPLIT = re.compile(r"^CASE\s*#\s*([^/\s]+)\s*/\s*(.*)$")
 # L8, L84A, L8/9 (first taken), L137-139 (first taken), PARCEL 45
 _CC_LOT = re.compile(r"\b(?:L|PARCEL\s+)(\d+[A-Z]?)")
