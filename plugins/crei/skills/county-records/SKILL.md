@@ -87,7 +87,7 @@ skill has no map for.
 
 ## Stage 1 — Pull the records (browser)
 
-Two vendors have verified handlers — follow the county's `vendor` entry:
+Follow the county's `vendor` entry to its verified handler:
 
 - **`acclaim` / `acclaim-v2`** → `references/acclaim.md`
 - **`landmark`** → `references/landmark.md` (key differences: disclaimer is a
@@ -109,6 +109,12 @@ Two vendors have verified handlers — follow the county's `vendor` entry:
   `python ${CLAUDE_SKILL_DIR}/scripts/tylerss_csv_to_csv.py SearchResults.CSV raw.csv`;
   labeled-token legals; timeshares → review. Open Tyler deployments exist —
   don't assume Tyler means gated.)
+- **`govos`** → `references/govos.md` (GovOS Cloud Search SPA at
+  `{county}.{st}.publicsearch.us` — Texas majors; no CAPTCHA, no disclaimer;
+  Advanced Search with a live doc-type picker; results URL is a constructible
+  GET; **the Export button is login-gated — ingest by transcribing the
+  results grid**, which carries full labeled-token legals; Grantee = the
+  lead; no case numbers in the data.)
 
 ### CAPTCHA policy (applies everywhere)
 

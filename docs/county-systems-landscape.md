@@ -178,7 +178,7 @@ Never auto-register or enter payment anywhere (router rule). Regime is
 | NewVision SearchNG | Open in theory, but **ClickOnce desktop app** | n/a | Do not attempt browser automation (Marion) |
 | Aumentum Public Access | **Open** — disclaimer then anonymous search (both UI variants) | Unknown; ASP.NET grid | Moderate; covers Orange (if confirmed) + Alachua |
 | OnCore (legacy) | **Open** — "Anonymous / Public Access" group | Unknown | Low priority; shrinking install base (migrations to Acclaim) |
-| GovOS Cloud Search (Neumo) | **Open** — anonymous; Register/Sign In optional (needed only for purchases/cart) | Unknown; results grid in SPA — JSON backend worth sniffing; full-text OCR search built in | **High priority** — 7 TX counties incl. 6 of top 10, one uniform app |
+| GovOS Cloud Search (Neumo) | **Open** — anonymous; Register/Sign In optional (needed only for purchases/cart). **Export button IS login-gated** | Grid transcription (full labeled-token legals incl. city render in-grid, untruncated); results URL is a constructible GET; doc images viewable anonymously; no case numbers | **Handler shipped** (Dallas 3/3, 2026-08-24) — 7 TX counties incl. 6 of top 10, one uniform app |
 | Custom FL portals | All **open** in our sample (Miami-Dade, Hillsborough, Volusia, Pasco, Leon, Collier, Manatee, Charlotte) | Pasco/Leon/Volusia are plain server-rendered forms (easy scrape, no export button); SPAs (Miami-Dade, Hillsborough, Collier) have JSON backends worth sniffing | Per-county one-offs |
 | Custom TX portals | Both **open** (Harris "Web Inquiry" form; El Paso plain form with LIS PENDENS doc type) | Harris: server-rendered ASP.NET, rich criteria; El Paso: 10-docs-per-view cap | Harris is the #3 US county by population — worth a one-off |
 | Tyler Eagle | **Gated** — document search requires account (GT prior recon); Tyler markets subscription "Records Public Access" | n/a for us | Skip (also: no FL) |
@@ -190,21 +190,22 @@ Never auto-register or enter payment anywhere (router rule). Regime is
 | Kofile/GovOS QuickLink | **Open** (Polk) | Index-book images only — not a lead source | Not useful for pipeline |
 | US Land Records | Free index search typical, paid images | Unknown | No FL; revisit for Northeast expansion |
 
-## 7. Recommended handler build order (re-ranked 2026-08-24 with TX sweep)
+## 7. Recommended handler build order (re-ranked 2026-08-24 with TX + GA sweeps)
 
 Shipped so far: **Acclaim** (Brevard pipeline), **Landmark Web** (Palm Beach
 verified 3/3), **NewVision BrowserView** (Polk verified 3/3), **Tyler
-Self-Service** (Orange verified 3/3) — see vendor-router capability matrix.
+Self-Service** (Orange verified 3/3), **GovOS Cloud Search** (Dallas verified
+3/3, 2026-08-24 — grid-transcription ingest, native export login-gated; six
+sister TX counties are unverified candidates in `counties.json`) — see
+vendor-router capability matrix.
 
-1. **GovOS Cloud Search (Neumo)** — new highest-ROI target. 7 open TX counties
-   on one uniform SPA (Dallas #2, Tarrant #3, Bexar #4, Collin, Denton, Hidalgo,
-   Cameron), guessable URL (`{county}.tx.publicsearch.us`), full-text OCR
-   search, likely JSON backend. First step: run one anonymous search and sniff
-   the results/export API — the Acclaim capability-matrix exercise. Unlocks
-   Texas the way Acclaim+Landmark unlocked Florida.
-2. **Aumentum Public Access** — strengthened by TX: Alachua FL + Travis TX +
+1. **Aumentum Public Access** — strengthened by TX: Alachua FL + Travis TX +
    Fort Bend TX, all on the identical ASP.NET variant (Version 2023.1.2), open.
    One handler now covers 3 counties across 2 states; the JSP variant can wait.
+2. **Remaining GovOS counties** — verify Tarrant, Bexar, Collin, Denton,
+   Hidalgo, Cameron against the shipped handler (enumerate doc types, confirm
+   legal format, map each county's CAD owner search — procedure in
+   `references/govos.md`). Cheapest coverage expansion available.
 3. **High-value custom one-offs, easiest first** — FL: Pasco (#12, classic ASP —
    trivial), Leon (#22), Volusia (#11). TX: **Harris (#1 TX / #3 US)** — open
    server-rendered ASP.NET "Web Inquiry" with rich criteria; El Paso (plain
@@ -228,6 +229,7 @@ Self-Service** (Orange verified 3/3) — see vendor-router capability matrix.
    fingerprint again when a handler pass reaches it. QuickLink historic books:
    not a lead source.
 
-With GovOS + Aumentum shipped, vendor-level coverage would span **17 of FL's 30
-established counties (incl. 8 of top 10) and 9 of TX's 11 established counties
-(incl. 8 of top 10)** — two handlers buy nearly all of Texas's majors.
+With GovOS shipped (Dallas verified; 6 sister counties pending per-county
+verification), adding Aumentum would take vendor-level coverage to **17 of
+FL's 30 established counties (incl. 8 of top 10) and 9 of TX's 11 (incl. 8 of
+top 10)**.

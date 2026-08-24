@@ -264,6 +264,147 @@
       "notes": "Fields: #OwnerName (unique match jumps straight to the property card), #Subdivision (paged results WITH Excel export), #ParcelID (##-##-##-####-##-###). Legal is under the PROPERTY FEATURES tab as 'Property Description'. Card shows owner names, mailing address, sales. Cross-check lot+block+subdivision; try ALL defendants (owner may be an entity co-defendant, not the first person named)."
     }
   },
+  "dallas-tx": {
+    "displayName": "Dallas County, TX",
+    "state": "TX",
+    "vendor": "govos",
+    "regime": "open",
+    "landingUrl": "https://dallas.tx.publicsearch.us/search/advanced",
+    "basePathHint": "/",
+    "docTypes": {
+      "lis_pendens": ["LIS PENDENS", "LIS PENDENS (NOTICE OF)"],
+      "_urlCodes": { "LIS PENDENS": "LP", "LIS PENDENS (NOTICE OF)": "LPS" }
+    },
+    "csvColumns": {
+      "caseNumber": null,
+      "provisional": null,
+      "_comment": "Columns come from transcribing the results grid (see references/govos.md): standard names. No case numbers in GovOS data - cc_case cannot fire. Town column carries the municipality."
+    },
+    "legalStyle": "govos-labeled",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": "17-char DCAD account (often visibly encodes block/lot, e.g. 160065700231R0000 = LT 31R); not constructible",
+      "verified": true,
+      "verifiedDate": "2026-08-24",
+      "verifiedSamples": 3,
+      "notes": "Join verified via DCAD owner search + legal cross-check: WO SMITH LT 11 (city column narrowed 4 same-name candidates), CEDAR BEND BLK 2 LT 31R (same owner, second filing), BONNIE VIEW GARDENS #1 REPLAT BLK F LOT 7A (entity grantee, commercial account). Two correct refusals (defendant owned a different property). Family-matter LPs often unjoinable - title under different name form."
+    },
+    "appraiser": {
+      "name": "DCAD",
+      "type": "owner-search",
+      "searchUrl": "https://www.dallascad.org/SearchOwner.aspx",
+      "notes": "Box #txtOwnerName (full last name + >=2 letters of first, 'Last First' order - the grid's Grantee is already in that order; % wildcard), button #cmdSubmit. Results link AcctDetailRes.aspx?ID= (residential) or AcctDetailCom.aspx?ID= (commercial). CROSS-CHECK the Legal Desc block: line 1 subdivision (names drift vs clerk), line 2 'BLK b LT n' - lot/block are the anchors; use city to narrow. Detail carries owner, mailing address, market value, deed date, exemptions."
+    }
+  },
+  "tarrant-tx": {
+    "displayName": "Tarrant County, TX",
+    "state": "TX",
+    "vendor": "govos",
+    "regime": "open",
+    "landingUrl": "https://tarrant.tx.publicsearch.us/search/advanced",
+    "basePathHint": "/",
+    "docTypes": { "lis_pendens": [] },
+    "legalStyle": "govos-labeled",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "Cloud Search app confirmed identical to Dallas 2026-08-24 (fingerprint only). Doc types, legal format, and join not yet verified; appraiser is TAD (tad.org)."
+    },
+    "appraiser": { "name": "TAD", "type": "unknown", "notes": "tad.org - to be mapped during Tarrant verification." }
+  },
+  "bexar-tx": {
+    "displayName": "Bexar County, TX",
+    "state": "TX",
+    "vendor": "govos",
+    "regime": "open",
+    "landingUrl": "https://bexar.tx.publicsearch.us/search/advanced",
+    "basePathHint": "/",
+    "docTypes": { "lis_pendens": [] },
+    "legalStyle": "govos-labeled",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "Cloud Search app confirmed identical to Dallas 2026-08-24 (fingerprint only). Appraiser is BCAD (bcad.org)."
+    },
+    "appraiser": { "name": "BCAD", "type": "unknown", "notes": "bcad.org - to be mapped during Bexar verification." }
+  },
+  "collin-tx": {
+    "displayName": "Collin County, TX",
+    "state": "TX",
+    "vendor": "govos",
+    "regime": "open",
+    "landingUrl": "https://collin.tx.publicsearch.us/search/advanced",
+    "basePathHint": "/",
+    "docTypes": { "lis_pendens": [] },
+    "legalStyle": "govos-labeled",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "Cloud Search app confirmed identical to Dallas 2026-08-24 (fingerprint only). Appraiser is Collin CAD (collincad.org)."
+    },
+    "appraiser": { "name": "Collin CAD", "type": "unknown", "notes": "collincad.org - to be mapped during Collin verification." }
+  },
+  "denton-tx": {
+    "displayName": "Denton County, TX",
+    "state": "TX",
+    "vendor": "govos",
+    "regime": "open",
+    "landingUrl": "https://denton.tx.publicsearch.us/search/advanced",
+    "basePathHint": "/",
+    "docTypes": { "lis_pendens": [] },
+    "legalStyle": "govos-labeled",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "Cloud Search app confirmed identical to Dallas 2026-08-24 (fingerprint only). Appraiser is Denton CAD (dentoncad.com)."
+    },
+    "appraiser": { "name": "Denton CAD", "type": "unknown", "notes": "dentoncad.com - to be mapped during Denton verification." }
+  },
+  "hidalgo-tx": {
+    "displayName": "Hidalgo County, TX",
+    "state": "TX",
+    "vendor": "govos",
+    "regime": "open",
+    "landingUrl": "https://hidalgo.tx.publicsearch.us/search/advanced",
+    "basePathHint": "/",
+    "docTypes": { "lis_pendens": [] },
+    "legalStyle": "govos-labeled",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "Cloud Search app confirmed identical to Dallas 2026-08-24 (fingerprint only). Appraiser is Hidalgo CAD (hidalgoad.org)."
+    },
+    "appraiser": { "name": "Hidalgo CAD", "type": "unknown", "notes": "hidalgoad.org - to be mapped during Hidalgo verification." }
+  },
+  "cameron-tx": {
+    "displayName": "Cameron County, TX",
+    "state": "TX",
+    "vendor": "govos",
+    "regime": "open",
+    "landingUrl": "https://cameron.tx.publicsearch.us/search/advanced",
+    "basePathHint": "/",
+    "docTypes": { "lis_pendens": [] },
+    "legalStyle": "govos-labeled",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "Cloud Search app confirmed identical to Dallas 2026-08-24 (fingerprint only). Appraiser is Cameron CAD (cameroncad.org)."
+    },
+    "appraiser": { "name": "Cameron CAD", "type": "unknown", "notes": "cameroncad.org - to be mapped during Cameron verification." }
+  },
   "broward-fl": {
     "displayName": "Broward County, FL",
     "state": "FL",

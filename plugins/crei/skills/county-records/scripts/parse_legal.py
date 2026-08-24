@@ -40,6 +40,7 @@ class ParsedNameLegal:
     block: Optional[str]
     subdivision: str
     raw: str
+    city: Optional[str] = None  # GovOS carries the municipality ("Township:") - disambiguates appraiser owner matches
 
 
 @dataclass
@@ -221,6 +222,56 @@ def parse_legal_labeled(legal: str) -> Union[ParsedNameLegal, ReviewRecord]:
         block=tokens.get("BLOCK"),
         subdivision=subdivision,
         raw=raw,
+    )
+
+
+# GovOS Cloud Search legals are segment-structured:
+#   'Subdivision - Name: LUNA BUSINESS PARK Lot: 1R Block: C Township: CARROLLTON Reference - 202600116366/'
+#   'Survey - Name: JJ METCALF SUR Survey: 885 Acres: 26.1'
+# "Township:" is the MUNICIPALITY (Dallas-area cities), not a PLSS township.
+# "Reference -" carries a prior book/page or instrument - not part of the legal.
+_GV_KIND = re.compile(r"\b(Subdivision|Survey|Condominium|Abstract)\s*-\s*Name:", re.I)
+_GV_LABELS = r"Name|Lot|Block|City Block|Township|Unit|Building|Survey|Acres|Tract"
+_GV_TOKEN = re.compile(
+    rf"\b({_GV_LABELS}):\s*(.+?)(?=\s+(?:{_GV_LABELS}):|\s+Reference\s*-|$)", re.I)
+
+
+def parse_legal_govos(legal: str) -> Union[ParsedNameLegal, ReviewRecord]:
+    """Parse a GovOS Cloud Search legal-description string (see grammar above).
+    Only the first Subdivision segment is used; Survey-only legals are
+    metes-and-bounds equivalents and go to review."""
+    raw = (legal or "").strip()
+    if not raw:
+        return ReviewRecord("empty", raw)
+
+    kinds = [(m.group(1).upper(), m.start()) for m in _GV_KIND.finditer(raw)]
+    if not kinds:
+        return ReviewRecord("missing_fields", raw, detail="no Subdivision/Survey segment")
+    sub_starts = [start for kind, start in kinds if kind == "SUBDIVISION"]
+    if not sub_starts:
+        if any(kind == "CONDOMINIUM" for kind, _ in kinds):
+            return ReviewRecord("condo_unit", raw)
+        return ReviewRecord("metes_and_bounds", raw)
+
+    # First Subdivision segment runs to the next kind marker (or end of string).
+    start = sub_starts[0]
+    later = [s for _, s in kinds if s > start]
+    segment = raw[start:min(later)] if later else raw[start:]
+
+    tokens = {m.group(1).upper(): m.group(2).strip()
+              for m in _GV_TOKEN.finditer(segment)}
+    subdivision = (tokens.get("NAME") or "").strip().upper() or None
+    lot = tokens.get("LOT") or tokens.get("UNIT")
+    if not subdivision:
+        return ReviewRecord("missing_fields", raw, detail="missing: subdivision name")
+    if not lot:
+        return ReviewRecord("missing_fields", raw, detail="missing: lot/unit")
+    return ParsedNameLegal(
+        lot=lot.upper(),
+        block=(tokens.get("BLOCK") or "").upper() or None,
+        subdivision=subdivision,
+        raw=raw,
+        city=(tokens.get("TOWNSHIP") or "").upper() or None,
     )
 
 
