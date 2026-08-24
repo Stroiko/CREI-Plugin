@@ -18,6 +18,7 @@ system itself.
 |---|---|---|
 | **Acclaim classic** | Disclaimer page with an "I accept the conditions above." button; search tiles (Name, Book/Page, Document Type…); footer "Acclaim, is a registered trademark of Harris Recording Solutions" | This skill, classic flow (`references/acclaim.md`) |
 | **Acclaim v2** | "Welcome, Guest" header, NO disclaimer gate; tile menu; footer "Copyright 1999–20xx. Harris Recording Solutions"; Kendo widgets (DocTypes multi-select "Select DocTypes...", `#FromDatePicker`/`#ToDatePicker`) | This skill, v2 flow (`references/acclaim.md`) — same `Search/ExportCsv` backend |
+| **Landmark Web** (Pioneer/Catalis) | Page title "Landmark Web …"; search tiles calling `LaunchDisclaimer(…)`; "Property Fraud Alert" link; "Subscriber Log On"; base path `/LandmarkWeb`, `/Landmark`, or domain root | This skill (`references/landmark.md`) — open, but a **reCAPTCHA on the search form** means one human click per search; possible Akamai interstitial (Lee) |
 | **Tyler Eagle** | `countygovernmentrecords.com` or state-branded Tyler domains; "You must register to conduct document searches" | STOP: tell the user their county requires a personal account; never register for them |
 | **Custom / other** (Kofile, Catalis, i3 Verticals, in-house systems like Manatee's "Public Records Hub" / MCCCC) | Anything without the Harris/Acclaim marks | Not supported for automation yet. Tell the user plainly, note the vendor name for future support, and offer the Zillow skill as the available alternative |
 

@@ -95,6 +95,90 @@
       "notes": "Search the DEFENDANT name; result rows link to parcel detail pages showing full legal description, mailing address, sales history, DOR use code. CROSS-CHECK REQUIRED: only accept a parcel whose legal matches the recorded lot/block/subdivision; multiple owner matches without a legal match = unenriched."
     }
   },
+  "palm-beach-fl": {
+    "displayName": "Palm Beach County, FL",
+    "state": "FL",
+    "vendor": "landmark",
+    "regime": "open-captcha",
+    "landingUrl": "https://erec.mypalmbeachclerk.com/",
+    "basePathHint": "/",
+    "docTypes": {
+      "lis_pendens": ["LP"]
+    },
+    "csvColumns": {
+      "legal": "Legal",
+      "caseNumber": null,
+      "provisional": null,
+      "recordDate": "Record Date Search",
+      "directName": "Direct Name",
+      "indirectName": "Reverse Name",
+      "instrument": "Instrument #",
+      "docType": "Doc Type",
+      "_comment": "Columns are from the converted XLSX export (xlsx_to_csv.py). Case number is extracted from the Legal text; provisional derives from Status != V."
+    },
+    "legalStyle": "landmark-columns",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": { "CC": "CC", "CA": "CA" },
+    "parcelId": {
+      "format": "CC-RR-TT-SS-SB-BBB-LLLL (PAPA PCN; sub code not in records, so not constructible)",
+      "verified": true,
+      "verifiedDate": "2026-08-24",
+      "verifiedSamples": 3,
+      "notes": "Join verified via PAPA owner search + cross-check on lot + section/township/range (subdivision names drift between clerk and PAPA, e.g. 'PHASE # 03' vs 'PH-2'): LAKES AT BOCA RATON PAR K LT 64, CYPRESS BEND LT 32, VILLAGE AT BOCA RIO PH-2 LT 133 - all single exact matches. PCN decodes as county(00)-range-township-section-sub-block-lot*10."
+    },
+    "appraiser": {
+      "name": "PAPA",
+      "type": "owner-search",
+      "searchUrl": "https://pbcpao.gov/index.htm",
+      "notes": "Quick search box #realsrchVal takes owner name (last name first - the export's Reverse Name is already in that order), address, or PCN; a unique owner match lands directly on /Property/Details?parcelId=<PCN>. Detail page shows legal description, mailing address, sales history. CROSS-CHECK on lot + S/T/R, not subdivision spelling."
+    }
+  },
+  "lee-fl": {
+    "displayName": "Lee County, FL",
+    "state": "FL",
+    "vendor": "landmark",
+    "regime": "open-challenge",
+    "landingUrl": "https://or.leeclerk.org/LandmarkWeb",
+    "basePathHint": "/LandmarkWeb",
+    "docTypes": {
+      "lis_pendens": []
+    },
+    "legalStyle": "landmark-columns",
+    "joinStrategy": "owner-lookup",
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "Landmark portal confirmed, but an Akamai 'Challenge Validation' interstitial fired on entering search (2026-08-24) - the user must complete it before the flow continues. Doc-type codes and join not yet verified; appraiser is leepa.org."
+    },
+    "appraiser": {
+      "name": "Lee Property Appraiser",
+      "type": "unknown",
+      "notes": "leepa.org - to be mapped during Lee verification."
+    }
+  },
+  "st-johns-fl": {
+    "displayName": "St. Johns County, FL",
+    "state": "FL",
+    "vendor": "landmark",
+    "regime": "open-captcha",
+    "landingUrl": "https://apps.stjohnsclerk.com/Landmark/Home/Index",
+    "basePathHint": "/Landmark",
+    "docTypes": {
+      "lis_pendens": []
+    },
+    "legalStyle": "landmark-columns",
+    "joinStrategy": "owner-lookup",
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "Structure confirmed identical to Palm Beach 2026-08-24 (same element IDs, reCAPTCHA on form, verified-through banner). Doc-type codes, export columns, and join not yet verified."
+    },
+    "appraiser": {
+      "name": "SJCPA",
+      "type": "unknown",
+      "notes": "sjcpa.gov - to be mapped during St. Johns verification."
+    }
+  },
   "broward-fl": {
     "displayName": "Broward County, FL",
     "state": "FL",

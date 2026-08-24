@@ -32,6 +32,9 @@ leads. Verified capability matrix:
 | Brevard, FL | ✓ (24 rows) | ✓ STR+SUBID style | construct `{T}-{R}-{S}-{SUBID}-{BLK|*}-{LOT}` | **Fully verified (6/6)** |
 | Pinellas, FL | ✓ (23 rows) | ✓ name-based, in `Comments` | subdivision-lookup on PCPAO | **Verified (3/3)**; condos → review |
 | Highlands, FL | ✓ (25 rows) | ✓ `CASE #/abbrev` in `Comments` | owner-lookup + legal cross-check on HCPAO | **Verified (3/3)** |
+| Palm Beach, FL | ✓ (93 rows/wk, XLSX export; reCAPTCHA = 1 human click per search) | ✓ **pre-parsed columns** (Lot/Sub/S-T-R) | owner-lookup on PAPA, cross-check lot+STR | **Verified (3/3)** — 2026-08-24 |
+| Lee, FL | Landmark confirmed; **Akamai interstitial** before search | expected same as PB | expected owner-lookup (leepa.org) | Blocked pending user-assisted run |
+| St. Johns, FL | Landmark, structure identical to PB | not yet pulled | unmapped | Candidate (verify next) |
 | Broward, FL | ✓ (43 rows) | ✗ empty on LP (0/43) | none from CSV | **Pull-only** — names/cases without parcels |
 | St. Lucie, FL | portal reachable (v2) | unmapped | unmapped | Candidate |
 | Manatee, FL | non-Acclaim (MCCCC), open, has Subdivision search | unmapped | unmapped | Candidate, different handler needed |

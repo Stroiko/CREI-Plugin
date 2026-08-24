@@ -97,6 +97,20 @@ guess.
 - Join: search the DEFENDANT name, cross-check the parcel's legal against the
   recorded lot/block/subdivision. Verified 3/3 (single exact matches).
 
+### Palm Beach (PAPA) — VERIFIED 2026-08-24 — owner-lookup join (Landmark county)
+
+- Clerk portal is **Landmark Web** (`erec.mypalmbeachclerk.com`) — full flow
+  verified incl. XLSX export (93 lis pendens in one week; 92/93 parsed via the
+  export's pre-parsed legal columns). One reCAPTCHA click by the user per search.
+- Appraiser: PAPA (`pbcpao.gov`) — quick search `#realsrchVal` by owner name
+  (last-first, matching the export's Reverse Name), address, or PCN; unique
+  match lands on `/Property/Details?parcelId=<PCN>` with legal description,
+  mailing address, sales history.
+- Join verified 3/3 via owner search + cross-check on **lot + S/T/R** (sub
+  names drift: clerk "VILLAGE AT BOCA RIO PHASE # 03" = PAPA "PH-2").
+- PCN decodes as `county(00)-RR-TT-SS-sub-BBB-(lot×10)` — instant cross-check
+  from the URL.
+
 ### Broward — PULL-ONLY (verified 2026-08-23)
 
 Acclaim export works (43 rows) but 0/43 lis pendens carried a legal

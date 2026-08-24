@@ -85,10 +85,29 @@ logs in themselves or we stop — never register or pay; unknown vendors mean
 "not supported yet," said plainly, never improvised scraping of a system this
 skill has no map for.
 
-## Stage 1 — Pull the records (Acclaim, browser)
+## Stage 1 — Pull the records (browser)
 
-Follow `references/acclaim.md` for the verified step-by-step flow, endpoints,
-and known gotchas. Summary:
+Two vendors have verified handlers — follow the county's `vendor` entry:
+
+- **`acclaim` / `acclaim-v2`** → `references/acclaim.md`
+- **`landmark`** → `references/landmark.md` (key differences: disclaimer is a
+  modal per session; a **reCAPTCHA sits on the search form** — the user
+  clicks it, you submit immediately; doc type is set via a picker, never
+  typed; export is an **XLSX** — convert with
+  `python ${CLAUDE_SKILL_DIR}/scripts/xlsx_to_csv.py in.xlsx out.csv`; the
+  export carries **pre-parsed legal columns**, so parsing is nearly free)
+
+### CAPTCHA policy (applies everywhere)
+
+A CAPTCHA that the site officially presents (Landmark's on-form reCAPTCHA,
+Lee's Akamai interstitial) is completed **by the user** — tell them exactly
+what to click and continue once they confirm. That is the site's intended
+flow for humans, and the human is present. What is NEVER done: solving or
+automating a CAPTCHA yourself, scripting around it, or replaying tokens.
+CAPTCHA tokens are single-use — have the form fully valid before the user
+clicks, and submit immediately after.
+
+### Acclaim flow summary (details in references/acclaim.md)
 
 1. Load the county's landing page; **discover the base path** from where the
    search tiles link (`/AcclaimWeb/...` on some counties, domain root on
@@ -219,7 +238,8 @@ them. Present the summary and the top leads; offer the CSV as the deliverable.
 | Situation | Action |
 |---|---|
 | Portal bounces to login | Gated deployment — tell the user, stop. Never register or pay. |
-| CAPTCHA / bot challenge | Stop, report. Do not attempt to bypass. |
+| CAPTCHA / bot challenge | Ask the user to complete it (see CAPTCHA policy); if no user is available or it keeps re-firing, stop and report. Never bypass. |
+| "Invalid Captcha" after submit | The single-use token was burned (usually by a form-validation error). Fix the form, ask the user to click again. |
 | Doc-type autocomplete shows no lis pendens option | Enumerate what IS offered; ask the user which distress doc types to pull. |
 | Zero results in window | Legitimate — released-through lag or quiet week. Widen the window within the banner date. |
 | Export returns error page instead of CSV | Retry once after 3s; then fall back to paging `Search/GridResults` (see references). |
