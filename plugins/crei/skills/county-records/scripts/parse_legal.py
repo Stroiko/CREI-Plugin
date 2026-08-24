@@ -186,6 +186,44 @@ def parse_legal_subfirst(legal: str) -> Union[ParsedNameLegal, ReviewRecord]:
     )
 
 
+_LB_TOKEN = re.compile(r"\b(Lot|Block|Unit|Tract|Section|Township|Range|Building):\s*([A-Z0-9.]+)", re.I)
+
+
+def parse_legal_labeled(legal: str) -> Union[ParsedNameLegal, ReviewRecord]:
+    """Parse labeled-token legals (Tyler Self-Service style):
+    'Lot: 8 Block: C    RI MAR RIDGE' / 'Unit: 2427    SOME CONDO'.
+    The subdivision NAME is whatever free text follows the labeled tokens."""
+    raw = (legal or "").strip()
+    text = re.sub(r"\s+", " ", raw.upper())
+    if not text:
+        return ReviewRecord("empty", raw)
+
+    # TS: = timeshare (fractional interests, e.g. Disney resorts) - not
+    # joinable to a whole parcel and not a usable lead.
+    if re.search(r"\bTS:", text):
+        return ReviewRecord("condo_unit", raw, detail="timeshare")
+
+    tokens = {m.group(1).upper(): m.group(2)
+              for m in _LB_TOKEN.finditer(raw)}
+    tail = _LB_TOKEN.sub("", raw)
+    subdivision = re.sub(r"\s+", " ", tail).strip(" .,-").upper() or None
+
+    lot = tokens.get("LOT") or tokens.get("UNIT") or tokens.get("TRACT")
+    if not lot:
+        if {"SECTION", "TOWNSHIP", "RANGE"} & tokens.keys():
+            return ReviewRecord("metes_and_bounds", raw)
+        return ReviewRecord("missing_fields", raw, detail="missing: lot/unit")
+    if not subdivision:
+        return ReviewRecord("missing_fields", raw, detail="missing: subdivision name")
+
+    return ParsedNameLegal(
+        lot=lot,
+        block=tokens.get("BLOCK"),
+        subdivision=subdivision,
+        raw=raw,
+    )
+
+
 _CC_SPLIT = re.compile(r"^CASE\s*#\s*([^/\s]+)\s*/\s*(.*)$")
 # L8, L84A, L8/9 (first taken), L137-139 (first taken), PARCEL 45
 _CC_LOT = re.compile(r"\b(?:L|PARCEL\s+)(\d+[A-Z]?)")

@@ -16,7 +16,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 from parse_legal import (parse_legal, parse_legal_namebased, parse_legal_case_comments,
-                         parse_legal_subfirst,
+                         parse_legal_subfirst, parse_legal_labeled,
                          ParsedLegal, ParsedNameLegal, ParsedCaseComments)
 from build_parcel_id import build_parcel_id
 from match_lookup import match_parcel
@@ -159,9 +159,10 @@ def cmd_parse(args):
             records.append(base)
             continue
 
-        if legal_style in ("name-based", "name-based-subfirst"):
-            parser = (parse_legal_subfirst if legal_style == "name-based-subfirst"
-                      else parse_legal_namebased)
+        if legal_style in ("name-based", "name-based-subfirst", "labeled-tokens"):
+            parser = {"name-based-subfirst": parse_legal_subfirst,
+                      "labeled-tokens": parse_legal_labeled}.get(
+                          legal_style, parse_legal_namebased)
             parsed = parser(base["legal"])
             if row.get("AllDefendants"):
                 base["all_defendants"] = [n.strip() for n in

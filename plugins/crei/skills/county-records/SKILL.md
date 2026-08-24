@@ -102,6 +102,13 @@ Two vendors have verified handlers — follow the county's `vendor` entry:
   `python ${CLAUDE_SKILL_DIR}/scripts/newvision_tsv_to_csv.py print.tsv raw.csv`;
   no case numbers in the data. NOT the ClickOnce "SearchNG" variant — that
   one is unautomatable.)
+- **`tyler-selfservice`** → `references/tyler-selfservice.md` (Tyler's
+  current `/ssweb` product; reCAPTCHA gates the entry disclaimer — one user
+  click per session; Advanced Document Search has stable field IDs; native
+  **Export as CSV**, then
+  `python ${CLAUDE_SKILL_DIR}/scripts/tylerss_csv_to_csv.py SearchResults.CSV raw.csv`;
+  labeled-token legals; timeshares → review. Open Tyler deployments exist —
+  don't assume Tyler means gated.)
 
 ### CAPTCHA policy (applies everywhere)
 

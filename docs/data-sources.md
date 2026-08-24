@@ -125,6 +125,24 @@ guess.
   parcel tail encodes lot×10).
 - Data gap: no case numbers in the clerk grid → `cc_case` signal unavailable.
 
+### Orange (OCPA) — VERIFIED 2026-08-24 — owner-lookup join (Tyler Self-Service county)
+
+- Clerk portal is **Tyler Self-Service** (`selfservice.or.occompt.com/ssweb`) —
+  anonymous, but the entry disclaimer's "I Accept" is reCAPTCHA-gated (one
+  user click per session). Advanced Document Search covers records after
+  6/1/2008 only. Native **Export as CSV** (44 lis pendens in the test week;
+  36/44 parsed — reviews were 6 Disney-area timeshares + 2 STR-only).
+- Correction: earlier research classified Orange as "Aumentum JSP variant"
+  from its version banner — wrong; fingerprint on the Tyler copyright +
+  `/ssweb` path.
+- Appraiser OCPA (`ocpaweb.ocpafl.org/parcelsearch`): owner search jumps
+  straight to the property card on a unique hit; legal under PROPERTY
+  FEATURES; subdivision search has an Excel export. Join verified 3/3 —
+  including a case where the first-named defendant owned a different
+  property (cross-check refused it) and the entity co-defendant was the true
+  owner. Parcel format `SS-TT-RR-SSSS-BB-LLL` (C→03, lot×10) is
+  constructible once the subdivision code is known.
+
 ### Broward — PULL-ONLY (verified 2026-08-23)
 
 Acclaim export works (43 rows) but 0/43 lis pendens carried a legal
