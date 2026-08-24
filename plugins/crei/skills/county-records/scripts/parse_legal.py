@@ -225,15 +225,22 @@ def parse_legal_labeled(legal: str) -> Union[ParsedNameLegal, ReviewRecord]:
     )
 
 
-# GovOS Cloud Search legals are segment-structured:
-#   'Subdivision - Name: LUNA BUSINESS PARK Lot: 1R Block: C Township: CARROLLTON Reference - 202600116366/'
-#   'Survey - Name: JJ METCALF SUR Survey: 885 Acres: 26.1'
-# "Township:" is the MUNICIPALITY (Dallas-area cities), not a PLSS township.
+# GovOS Cloud Search legals are segment-structured, but the TEMPLATE IS
+# PER-COUNTY. Two live variants:
+#   Dallas/Collin/Denton/Hidalgo ("dash" template):
+#     'Subdivision - Name: LUNA BUSINESS PARK Lot: 1R Block: C Township: CARROLLTON Reference - 202600116366/'
+#     'Survey - Name: JJ METCALF SUR Survey: 885 Acres: 26.1'
+#   Tarrant ("comma" template, leading municipality, no "Name:" label):
+#     'FORT WORTH, Subdivision: MORNINGSIDE TERRACE, Lot: 26, Block: 1'
+# "Township:" / the leading city is the MUNICIPALITY, not a PLSS township.
 # "Reference -" carries a prior book/page or instrument - not part of the legal.
 _GV_KIND = re.compile(r"\b(Subdivision|Survey|Condominium|Abstract)\s*-\s*Name:", re.I)
 _GV_LABELS = r"Name|Lot|Block|City Block|Township|Unit|Building|Survey|Acres|Tract"
 _GV_TOKEN = re.compile(
-    rf"\b({_GV_LABELS}):\s*(.+?)(?=\s+(?:{_GV_LABELS}):|\s+Reference\s*-|$)", re.I)
+    rf"\b({_GV_LABELS}):\s*(.+?)(?=\s*,?\s+(?:{_GV_LABELS}):|\s+Reference\s*-|\s*,|$)", re.I)
+_GV_COMMA = re.compile(
+    r"^(?:(?P<city>[^,:]+),\s*)?Subdivision:\s*(?P<sub>[^,]+)"
+    r"(?:,\s*Lot:\s*(?P<lot>[^,]+))?(?:,\s*Block:\s*(?P<block>[^,]+))?", re.I)
 
 
 def parse_legal_govos(legal: str) -> Union[ParsedNameLegal, ReviewRecord]:
@@ -246,6 +253,19 @@ def parse_legal_govos(legal: str) -> Union[ParsedNameLegal, ReviewRecord]:
 
     kinds = [(m.group(1).upper(), m.start()) for m in _GV_KIND.finditer(raw)]
     if not kinds:
+        m = _GV_COMMA.match(raw)
+        if m:
+            sub = (m.group("sub") or "").strip().upper()
+            lot = (m.group("lot") or "").strip().upper()
+            if not lot:
+                return ReviewRecord("missing_fields", raw, detail="missing: lot/unit")
+            return ParsedNameLegal(
+                lot=lot,
+                block=(m.group("block") or "").strip().upper() or None,
+                subdivision=sub,
+                raw=raw,
+                city=(m.group("city") or "").strip().upper() or None,
+            )
         return ReviewRecord("missing_fields", raw, detail="no Subdivision/Survey segment")
     sub_starts = [start for kind, start in kinds if kind == "SUBDIVISION"]
     if not sub_starts:

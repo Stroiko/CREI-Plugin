@@ -202,10 +202,12 @@ vendor-router capability matrix.
 1. **Aumentum Public Access** — strengthened by TX: Alachua FL + Travis TX +
    Fort Bend TX, all on the identical ASP.NET variant (Version 2023.1.2), open.
    One handler now covers 3 counties across 2 states; the JSP variant can wait.
-2. **Remaining GovOS counties** — verify Tarrant, Bexar, Collin, Denton,
-   Hidalgo, Cameron against the shipped handler (enumerate doc types, confirm
-   legal format, map each county's CAD owner search — procedure in
-   `references/govos.md`). Cheapest coverage expansion available.
+2. **Remaining GovOS counties** — DONE 2026-08-24: Tarrant, Bexar, Denton
+   verified 3/3 (see vendor-router capability matrix); Collin + Hidalgo
+   pull-verified with documented caveats (detail-page legals; Collin parties
+   undifferentiated); **Cameron has zero LP supply in the OR index** (full-year
+   search empty — district-clerk filings suspected). GovOS now = 4 verified +
+   2 partial of 7 counties.
 3. **High-value custom one-offs, easiest first** — FL: Pasco (#12, classic ASP —
    trivial), Leon (#22), Volusia (#11). TX: **Harris (#1 TX / #3 US)** — open
    server-rendered ASP.NET "Web Inquiry" with rich criteria; El Paso (plain

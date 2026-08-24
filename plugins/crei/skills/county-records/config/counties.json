@@ -304,16 +304,31 @@
     "regime": "open",
     "landingUrl": "https://tarrant.tx.publicsearch.us/search/advanced",
     "basePathHint": "/",
-    "docTypes": { "lis_pendens": [] },
+    "docTypes": {
+      "lis_pendens": ["LIS PENDENS"],
+      "_urlCodes": { "LIS PENDENS": "LP" }
+    },
+    "csvColumns": {
+      "caseNumber": null,
+      "provisional": null,
+      "_comment": "Grid transcription. Tarrant uses the COMMA legal template ('{CITY}, Subdivision: X, Lot: n, Block: b') - the govos parser handles both templates. Instrument numbers are D-prefixed (D226158506). ~8 LP/wk."
+    },
     "legalStyle": "govos-labeled",
     "joinStrategy": "owner-lookup",
     "caseClassPatterns": {},
     "parcelId": {
-      "format": null,
-      "verified": false,
-      "notes": "Cloud Search app confirmed identical to Dallas 2026-08-24 (fingerprint only). Doc types, legal format, and join not yet verified; appraiser is TAD (tad.org)."
+      "format": "TAD account; GEO ID = {subCode}-{block}-{lot} (e.g. 13569A-9-15) - deterministic once the parcel is found",
+      "verified": true,
+      "verifiedDate": "2026-08-24",
+      "verifiedSamples": 3,
+      "notes": "Join verified via TAD LegalDescription search: FALCON RIDGE Block 9 Lot 15 (13569A-9-15; owner drift to an LLC surfaced honestly), STONE LAKES ADDITION Block 8 Lot 81 (title under defendant's spouse - legal-first search immune to name drift), MORNINGSIDE TERRACE ADDITION Block 1 Lot 26 (title under the GRANTOR - family case; try-all-parties confirmed). TAD appends 'ADDITION' to sub names but the query matches without it."
     },
-    "appraiser": { "name": "TAD", "type": "unknown", "notes": "tad.org - to be mapped during Tarrant verification." }
+    "appraiser": {
+      "name": "TAD",
+      "type": "legal-search",
+      "searchUrl": "https://www.tad.org/search-results?rows=100&page=1&searchType=LegalDescription&filter=R&query={SUB}%20BLOCK%20{block}%20LOT%20{lot}",
+      "notes": "CONSTRUCTIBLE URL - search by legal, not owner: query '{SUB} BLOCK {b} LOT {l}' returns the exact parcel row (address, city, owner, value) with a link to the detail page. Owner-name search is fuzzy (matches any token) - use only as fallback. New portal tarrant.prodigycad.com has subdivision-picker advanced search + Excel export but flaky SPA state."
+    }
   },
   "bexar-tx": {
     "displayName": "Bexar County, TX",
@@ -322,16 +337,32 @@
     "regime": "open",
     "landingUrl": "https://bexar.tx.publicsearch.us/search/advanced",
     "basePathHint": "/",
-    "docTypes": { "lis_pendens": [] },
+    "docTypes": {
+      "lis_pendens": ["LIS PENDENS"],
+      "_urlCodes": { "LIS PENDENS": "LIS PEN" }
+    },
+    "csvColumns": {
+      "caseNumber": null,
+      "provisional": null,
+      "_comment": "Grid transcription WITH the extra pre-parsed columns: Lot, Block, NCB, CountyBlock, PropertyAddress (headers must be transcribed verbatim - the parser's column fallback reads Lot/Block/PropertyAddress when the legal string is empty). PARTY SEMANTICS INVERTED vs Dallas: GRANTOR = property owner/defendant (the lead), GRANTEE = plaintiff (HOAs, lenders, taxing units). ~40 LP/wk, HOA-suit heavy."
+    },
+    "partyRoles": { "lead": "grantor", "plaintiff": "grantee" },
     "legalStyle": "govos-labeled",
     "joinStrategy": "owner-lookup",
     "caseClassPatterns": {},
     "parcelId": {
-      "format": null,
-      "verified": false,
-      "notes": "Cloud Search app confirmed identical to Dallas 2026-08-24 (fingerprint only). Appraiser is BCAD (bcad.org)."
+      "format": "BCAD Property ID; GEO ID = {NCB/CB padded}-{block}-{lot*10} (e.g. 05752-328-0390)",
+      "verified": true,
+      "verifiedDate": "2026-08-24",
+      "verifiedSamples": 3,
+      "notes": "Join verified via BCAD phrase-refined ADDRESS search (grid supplies the address): 13830 LLAMA PLACE -> CB 5752C SILOS BLOCK 28 LOT 39 (owner = LP grantor GONZALEZ, confirming inverted roles), 10918 MERRICK RUN -> CB 4450G BLOCK 238 LOT 47 (sub name drifts: 'Davis Ranch' = 'McCRARY TRACT'; lot/block anchors held), 7430 SILOS RIDGE -> BLOCK 28 LOT 30. Cross-check grid Lot/Block/CountyBlock vs the BCAD legal."
     },
-    "appraiser": { "name": "BCAD", "type": "unknown", "notes": "bcad.org - to be mapped during Bexar verification." }
+    "appraiser": {
+      "name": "BCAD",
+      "type": "address-search",
+      "searchUrl": "https://hgo.harrisgovern.com/bexar/property/search",
+      "notes": "Harris Govern portal. Enable 'Refine search for phrases', enter the grid's PropertyAddress (street number + name, drop city/state/zip) - single card returns Property ID, GEO ID, legal, owner, market value. Cross-check lot/block/CB. Address missing on a record -> fall back to owner-name tokens + legal cross-check."
+    }
   },
   "collin-tx": {
     "displayName": "Collin County, TX",
@@ -340,16 +371,30 @@
     "regime": "open",
     "landingUrl": "https://collin.tx.publicsearch.us/search/advanced",
     "basePathHint": "/",
-    "docTypes": { "lis_pendens": [] },
+    "docTypes": {
+      "lis_pendens": ["LIS PENDENS"],
+      "_urlCodes": { "LIS PENDENS": "LP" }
+    },
+    "csvColumns": {
+      "caseNumber": null,
+      "provisional": null,
+      "_comment": "CAUTION (verified 2026-08-24): the results grid shows NO legals and lists the SAME name as both grantor and grantee - Collin indexes every party under both roles. Full legals (Dallas dash template) + the complete party list are on each doc's detail page (/doc/{id}) - per-doc visits required. Plaintiff/defendant CANNOT be distinguished from the index; ship all parties flagged. ~10 LP/wk, HOA-heavy."
+    },
+    "partyRoles": { "lead": "undifferentiated" },
     "legalStyle": "govos-labeled",
     "joinStrategy": "owner-lookup",
     "caseClassPatterns": {},
     "parcelId": {
       "format": null,
       "verified": false,
-      "notes": "Cloud Search app confirmed identical to Dallas 2026-08-24 (fingerprint only). Appraiser is Collin CAD (collincad.org)."
+      "notes": "Pull verified (detail-page ingest); join NOT verified - one owner-search attempt on esearch.collincad.org cross-checked correctly (refused a same-surname different-property candidate) but no positive 3/3 run yet. Undifferentiated parties make owner-lookup ambiguous; try all parties from the detail page."
     },
-    "appraiser": { "name": "Collin CAD", "type": "unknown", "notes": "collincad.org - to be mapped during Collin verification." }
+    "appraiser": {
+      "name": "Collin CAD",
+      "type": "owner-search",
+      "searchUrl": "https://esearch.collincad.org/",
+      "notes": "BIS esearch portal (invisible reCAPTCHA badge present - may require a user click). Owner tab: 'Last First'; results show Geo ID (R-{sub}-{blk}-{lot}-1 style), address, full legal ('{SUB} (code), BLK x, LOT y') for cross-check. Advanced tab has subdivision/block/lot fields - map during full verification."
+    }
   },
   "denton-tx": {
     "displayName": "Denton County, TX",
@@ -358,16 +403,31 @@
     "regime": "open",
     "landingUrl": "https://denton.tx.publicsearch.us/search/advanced",
     "basePathHint": "/",
-    "docTypes": { "lis_pendens": [] },
+    "docTypes": {
+      "lis_pendens": ["LIS PENDENS (NOTICE OF)"],
+      "_urlCodes": { "LIS PENDENS (NOTICE OF)": "LP" }
+    },
+    "csvColumns": {
+      "caseNumber": null,
+      "provisional": null,
+      "_comment": "Grid transcription with extra Lot/Block columns; the SUBDIVISION NAME only appears on each doc's detail page (/doc/{id}, Dallas dash template) - visit details for full legals, or run column-fallback with lot/block only. Instrument format 2026-95574. ~4 LP/wk."
+    },
     "legalStyle": "govos-labeled",
     "joinStrategy": "owner-lookup",
     "caseClassPatterns": {},
     "parcelId": {
-      "format": null,
-      "verified": false,
-      "notes": "Cloud Search app confirmed identical to Dallas 2026-08-24 (fingerprint only). Appraiser is Denton CAD (dentoncad.com)."
+      "format": "Denton CAD GEO ID = S{subCode}-{block padded}-0000-{lot padded}-0000 (e.g. SD4456A-0000018-0000-0011-0000)",
+      "verified": true,
+      "verifiedDate": "2026-08-24",
+      "verifiedSamples": 3,
+      "notes": "Join verified via Denton CAD compound search (owner surname): MAHLO -> SD4456A blk 18 lot 11 (PALOMA CREEK SOUTH; co-owner CANNON GENA was the doc's other party), BOGGALA -> SL0732A blk A lot 7, MCKINNEY JEFFREY -> SF0361A blk B lot 9. The GEO ID visibly encodes block+lot - cross-check against the grid's Lot/Block columns."
     },
-    "appraiser": { "name": "Denton CAD", "type": "unknown", "notes": "dentoncad.com - to be mapped during Denton verification." }
+    "appraiser": {
+      "name": "Denton CAD",
+      "type": "owner-search",
+      "searchUrl": "https://denton.prodigycad.com/property-search",
+      "notes": "True Prodigy portal (same as Tarrant's new one). Compound Text Search box: defendant surname works well for uncommon names; results grid shows GEO ID / owner / address / legal columns + Export as Excel. Cross-check block+lot embedded in the GEO ID."
+    }
   },
   "hidalgo-tx": {
     "displayName": "Hidalgo County, TX",
@@ -376,16 +436,25 @@
     "regime": "open",
     "landingUrl": "https://hidalgo.tx.publicsearch.us/search/advanced",
     "basePathHint": "/",
-    "docTypes": { "lis_pendens": [] },
+    "docTypes": {
+      "lis_pendens": ["LIS PENDENS", "LIS PENDENS, NOTICE", "NOTICE OF LIS PENDEN"],
+      "_urlCodes": { "LIS PENDENS": "LIS PENDENS", "NOTICE OF LIS PENDEN": "NOTICE OF LIS P" },
+      "_comment": "14 LIS variants in the picker (AMD/COR/REL/MEM/C C prefixes = amendments/corrections/releases/copies - skip). URL codes here are FULL NAMES, not short codes."
+    },
+    "csvColumns": {
+      "caseNumber": null,
+      "provisional": null,
+      "_comment": "Grid shows no legals; full legals (Dallas dash template, e.g. 'Subdivision - Name: LOS EJIDOS DE REYNOSA VIEJO GRANT Lot: 322 Reference - 7/5') on doc detail pages. LOW VOLUME: ~5 LP per 2 weeks. Instrument format 2026-3778518."
+    },
     "legalStyle": "govos-labeled",
     "joinStrategy": "owner-lookup",
     "caseClassPatterns": {},
     "parcelId": {
       "format": null,
       "verified": false,
-      "notes": "Cloud Search app confirmed identical to Dallas 2026-08-24 (fingerprint only). Appraiser is Hidalgo CAD (hidalgoad.org)."
+      "notes": "Pull verified 2026-08-24 (doc types enumerated, detail-page legals confirmed Dallas template); join not yet verified. Many legals are Spanish land-grant styles (porciones/ejidos) - expect elevated review rates."
     },
-    "appraiser": { "name": "Hidalgo CAD", "type": "unknown", "notes": "hidalgoad.org - to be mapped during Hidalgo verification." }
+    "appraiser": { "name": "Hidalgo CAD", "type": "unknown", "notes": "hidalgoad.org - to be mapped during join verification." }
   },
   "cameron-tx": {
     "displayName": "Cameron County, TX",
@@ -394,16 +463,19 @@
     "regime": "open",
     "landingUrl": "https://cameron.tx.publicsearch.us/search/advanced",
     "basePathHint": "/",
-    "docTypes": { "lis_pendens": [] },
+    "docTypes": {
+      "lis_pendens": ["LIS PENDENS"],
+      "_urlCodes": { "LIS PENDENS": "LP" }
+    },
     "legalStyle": "govos-labeled",
     "joinStrategy": "owner-lookup",
     "caseClassPatterns": {},
     "parcelId": {
       "format": null,
       "verified": false,
-      "notes": "Cloud Search app confirmed identical to Dallas 2026-08-24 (fingerprint only). Appraiser is Cameron CAD (cameroncad.org)."
+      "notes": "IMPORTANT FINDING (2026-08-24): the LIS PENDENS type exists in the picker but returns ZERO documents over a full test year (searched via both short and full-name URL codes) - Cameron lis pendens apparently are NOT recorded in the county OR index (likely district-clerk filings only). Treat Cameron as no-LP-supply until a source is found; other distress doc types unexplored."
     },
-    "appraiser": { "name": "Cameron CAD", "type": "unknown", "notes": "cameroncad.org - to be mapped during Cameron verification." }
+    "appraiser": { "name": "Cameron CAD", "type": "unknown", "notes": "cameroncad.org - to be mapped if a record source materializes." }
   },
   "broward-fl": {
     "displayName": "Broward County, FL",
