@@ -15,7 +15,9 @@ county, tell the user upfront whether the pipeline can run there.
 | Acclaim classic | Footer "Acclaim, is a registered trademark of Harris Recording Solutions"; disclaimer gate; search tiles | Brevard, Pinellas, Broward |
 | Acclaim v2 | "Welcome, Guest" header; "Copyright 1999–2026. Harris Recording Solutions"; Kendo widgets; no disclaimer gate | Highlands, St. Lucie |
 | Tyler Eagle | `countygovernmentrecords.com` domains; Tyler footer | (prior recon) **login-gated** |
-| Custom in-house | anything else — e.g. Manatee's "Public Records Hub" (MCCCC) | Manatee |
+| GovOS Cloud Search (Kofile→GovOS→Neumo) | Host `{county}.{st}.publicsearch.us`; title "Official Record Search - Quick Search - …"; "Powered By Neumo" footer; "Certified through" banner; Quick/Advanced tabs, OCR full-text option, "Property Alert" | Dallas, Tarrant, Bexar, Collin, Denton, Hidalgo, Cameron — all TX, all open (2026-08-24). **No handler yet** |
+| Aumentum Recorder – Public Access (Harris) | Footer "Aumentum Recorder - Public Access Web UI, Version 20xx.x.x … Harris Recording Solutions"; disclaimer + accept; `/RealEstate/SearchEntry.aspx` paths | Alachua FL; Travis TX (`tccsearch.org`), Fort Bend TX (`ccweb.co.fort-bend.tx.us`) — all Version 2023.1.2, open (2026-08-24). **No handler yet** |
+| Custom in-house | anything else — e.g. Manatee's "Public Records Hub" (MCCCC); Harris Co. TX "Web Inquiry" (`cclerk.hctx.net`); El Paso TX (`apps.epcountytx.gov/publicrecords`) | Manatee; Harris TX, El Paso TX (open, 2026-08-24) |
 
 ## Step 2 — access regime (per deployment)
 

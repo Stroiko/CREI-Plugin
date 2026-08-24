@@ -22,7 +22,9 @@ system itself.
 | **NewVision BrowserView** | Angular SPA at `/browserview*`; banner "Verified as of MM/DD/YYYY"; footer "© 2018 NewVision Systems Corporation"; tabs Search/Results/Document with Party/Document Type sub-tabs | This skill (`references/newvision.md`) — open, no CAPTCHA; ingest via Print Results page. **`nvweb.` SearchNG variant = ClickOnce desktop app, unautomatable** |
 | **Tyler Self-Service** | Footer "© Tyler Technologies \| Version 20xx.x.x"; URL path `/ssweb/`; disclaimer page whose "I Accept" is gated by reCAPTCHA | This skill (`references/tyler-selfservice.md`) — verified OPEN on Orange FL; one human CAPTCHA click per session. Legacy `/recorder/eagleweb/` URLs often redirect here |
 | **Tyler Eagle (legacy/gated)** | `countygovernmentrecords.com` or state-branded Tyler domains; "You must register to conduct document searches" | If it bounces to login: STOP, tell the user their county requires a personal account; never register for them. If it redirects to `/ssweb`, use the Tyler Self-Service handler |
-| **Custom / other** (Kofile, Catalis, i3 Verticals, in-house systems like Manatee's "Public Records Hub" / MCCCC) | Anything without the Harris/Acclaim marks | Not supported for automation yet. Tell the user plainly, note the vendor name for future support, and offer the Zillow skill as the available alternative |
+| **GovOS Cloud Search** (Kofile→GovOS→Neumo) | Host `{county}.{st}.publicsearch.us`; title "Official Record Search - Quick Search - …"; footer "Powered By Neumo"; "Certified through MM/DD/YYYY" banner; Quick/Advanced search tabs, department picker, Index vs Full-Text (OCR) radio, "Property Alert" link | **Recognized, no handler yet.** Open anonymous search (Register/Sign In only for purchases) — dominant in Texas (Dallas, Tarrant, Bexar, Collin, Denton, Hidalgo, Cameron). Tell the user their county's system is recognized and open but automation isn't built yet. Sister site `kofilequicklinks.com/...` = historic index books only, never a lead source |
+| **Aumentum Recorder – Public Access** (Harris) | Footer "Aumentum Recorder - Public Access Web UI, Version 20xx.x.x Copyright © 2001 - 20xx Harris Recording Solutions"; disclaimer page with accept link; paths under `/RealEstate/` (e.g. `SearchEntry.aspx`) | **Recognized, no handler yet.** Open after disclaimer (Alachua FL, Travis TX via tccsearch.org, Fort Bend TX). Same message as GovOS |
+| **Custom / other** (Catalis, i3 Verticals, in-house systems like Manatee's "Public Records Hub" / MCCCC, Harris County TX "Web Inquiry") | Anything without the marks above | Not supported for automation yet. Tell the user plainly, note the vendor name for future support, and offer the Zillow skill as the available alternative |
 
 A county could theoretically run Acclaim behind a mandatory login — regime is
 per-deployment, so always confirm Step 3.
@@ -72,4 +74,7 @@ note to the user.
   filings; you'll get names, dates and case numbers only."
 - Gated / Tyler → "Your county requires a personal account; I can't automate
   that, but I can walk you through searching manually."
+- Recognized vendor, no handler (GovOS Cloud Search, Aumentum) → "Your county
+  runs <vendor>, which is open for anonymous search, but automation for it
+  isn't built yet" — then offer to walk the search manually.
 - Unknown vendor → "Not supported yet" + record the fingerprint.

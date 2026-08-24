@@ -8,6 +8,7 @@ Glossary for the CREI (Claude Real Estate Investing) plugin. Terms here are cano
 - **Layer A** — browser work run locally through Claude in Chrome (county record portals, Zillow). Ships as SKILL.md instructions, not code.
 - **Layer B** — deterministic parse/join/score code run in the Cowork sandbox on the CSV Layer A produced. Ships as bundled Python scripts.
 - **Vendor** — the software platform a county's record portal runs on (Acclaim, Tyler Eagle, Kofile, …). Detected by fingerprint, never assumed.
+- **Fingerprint** — the page-level evidence (title, URL path, footer string, UI structure) that identifies a Vendor at runtime. Fingerprints ship in the skill so classification happens live at the portal; county→vendor censuses live only in repo docs and are allowed to go stale.
 - **Access regime** — whether a specific county deployment is **Open** (anonymous search reachable after accepting a disclaimer) or **Gated** (mandatory login). Per-deployment, not per-vendor. Open → automate; Gated → the user logs in themselves; never auto-create accounts or enter payment.
 - **Signal stacking** — scoring a property on multiple co-occurring distress signals (lis pendens + absentee owner + long tenure + …). The product's differentiator; every score must be explainable from `scoring.yaml`.
 - **Released-through date** — the high-water mark shown in the Acclaim results banner. Records past it exist but are not yet released; never query beyond it.
