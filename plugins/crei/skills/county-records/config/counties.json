@@ -231,6 +231,39 @@
       "notes": "To be mapped during Osceola verification."
     }
   },
+  "orange-fl": {
+    "displayName": "Orange County, FL",
+    "state": "FL",
+    "vendor": "tyler-selfservice",
+    "regime": "open-captcha",
+    "landingUrl": "https://selfservice.or.occompt.com/ssweb/user/disclaimer",
+    "basePathHint": "/ssweb",
+    "docTypes": {
+      "lis_pendens": ["Lis Pendens"]
+    },
+    "csvColumns": {
+      "legal": "DocLegalDescription",
+      "caseNumber": null,
+      "provisional": null,
+      "_comment": "Columns come from tylerss_csv_to_csv.py (standard names). No case numbers or verification flags in the export."
+    },
+    "legalStyle": "labeled-tokens",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": "SS-TT-RR-SSSS-BB-LLL (OCPA; block letters map to numbers C=03, lot is x10 zero-padded; constructible once the 4-digit subdivision code is known via subdivision search)",
+      "verified": true,
+      "verifiedDate": "2026-08-24",
+      "verifiedSamples": 3,
+      "notes": "Join verified via OCPA: RI MAR RIDGE LOT 8 BLK C (owner search, unique hit straight to card), JACQUELYN HEIGHTS LOT 12 BLK B (owner search), NORTH PINE HILLS LOT 2 BLK C (person defendant owned a DIFFERENT property - cross-check correctly refused; entity co-defendant + constructed parcel 06-22-29-5978-03-020 resolved it). Advanced Document Search only covers records after 6/1/2008."
+    },
+    "appraiser": {
+      "name": "OCPA",
+      "type": "owner-search",
+      "searchUrl": "https://ocpaweb.ocpafl.org/parcelsearch",
+      "notes": "Fields: #OwnerName (unique match jumps straight to the property card), #Subdivision (paged results WITH Excel export), #ParcelID (##-##-##-####-##-###). Legal is under the PROPERTY FEATURES tab as 'Property Description'. Card shows owner names, mailing address, sales. Cross-check lot+block+subdivision; try ALL defendants (owner may be an entity co-defendant, not the first person named)."
+    }
+  },
   "broward-fl": {
     "displayName": "Broward County, FL",
     "state": "FL",

@@ -44,7 +44,7 @@ most); nothing here required login.
 | 2 | Broward | Acclaim classic | `officialrecords.broward.org/AcclaimWeb` | GT. Open; CSV pull-only (no legals) |
 | 3 | Palm Beach | **Landmark Web** | `erec.mypalmbeachclerk.com/` | Title "Landmark Web Home Page". Open |
 | 4 | Hillsborough | Custom SPA ("ORI Public Access") | `publicaccess.hillsclerk.com/oripublicaccess/` | Linked from hillsclerk.com as "Search Official Records Online". Client-rendered SPA, no vendor branding on landing; vendor undetermined. (HOVER = court records only.) |
-| 5 | Orange | Aumentum Recorder JSP variant (REPORTED vendor ID) | `or.occompt.com/recorder/web/` | Comptroller-run. JSP disclaimer gate, "Version: 2025.1.32" — matches Aumentum's `20xx.x.x` version banner (cf. Alachua); no vendor string exposed. Open after "I Accept" |
+| 5 | Orange | **Tyler Self-Service** (CORRECTED 2026-08-24 — earlier "Aumentum JSP variant" guess was wrong) | `selfservice.or.occompt.com/ssweb/` | Footer "© 2014-2025 Tyler Technologies \| Version 2025.1.32". Legacy `/recorder/eagleweb/` redirects here; legacy site discontinued 9/1/25. **Open** (anonymous) with reCAPTCHA-gated entry disclaimer. Fully verified incl. CSV export + 3/3 OCPA joins — see vendor-router.md |
 | 6 | Pinellas | Acclaim classic | `officialrecords.mypinellasclerk.gov` | GT. Open, CSV verified |
 | 7 | Duval | Acclaim classic | `or.duvalclerk.com/` | Harris footer verbatim; `oncore.duvalclerk.com` 301s here (migrated from OnCore). Open |
 | 8 | Lee | **Landmark Web** | `or.leeclerk.org/LandmarkWeb` | Title + full tile set + "Subscriber Log On". Open |

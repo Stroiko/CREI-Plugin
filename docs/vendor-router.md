@@ -34,6 +34,7 @@ leads. Verified capability matrix:
 | Highlands, FL | ✓ (25 rows) | ✓ `CASE #/abbrev` in `Comments` | owner-lookup + legal cross-check on HCPAO | **Verified (3/3)** |
 | Palm Beach, FL | ✓ (93 rows/wk, XLSX export; reCAPTCHA = 1 human click per search) | ✓ **pre-parsed columns** (Lot/Sub/S-T-R) | owner-lookup on PAPA, cross-check lot+STR | **Verified (3/3)** — 2026-08-24 |
 | Polk, FL | ✓ (79 docs/wk via Print Results TSV; no CAPTCHA) | ✓ sub-first name-based; some legals ARE parcel IDs | owner-lookup on polkflpa.gov + legal cross-check | **Verified (3/3)** — 2026-08-24; no case numbers in data |
+| Orange, FL | ✓ (44 docs/wk, native CSV export; reCAPTCHA at entry = 1 human click/session) | ✓ labeled tokens (Lot:/Block:/Unit:); TS: timeshares → review | owner-lookup on OCPA (try ALL defendants) + subdivision fallback; parcel constructible once sub code known | **Verified (3/3)** — 2026-08-24. Vendor = **Tyler Self-Service** (NOT Aumentum as first reported); no case numbers |
 | Osceola, FL | BrowserView identical to Polk; codes LP+LPCT | expected same | expected owner-lookup | Candidate (verify next) |
 | Lee, FL | Landmark confirmed; **Akamai interstitial** before search | expected same as PB | expected owner-lookup (leepa.org) | Blocked pending user-assisted run |
 | St. Johns, FL | Landmark, structure identical to PB | not yet pulled | unmapped | Candidate (verify next) |
