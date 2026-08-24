@@ -42,6 +42,18 @@ class ParsedNameLegal:
     raw: str
 
 
+@dataclass
+class ParsedCaseComments:
+    """Case-comments legal (Highlands style): 'CASE # 26-413-GCAXMX/L8 PT L9
+    BLK 180 WOODLAWN TERRACE'. Joins via appraiser owner-name lookup with a
+    legal-description cross-check."""
+    case_number: str
+    lot: str
+    block: Optional[str]
+    subdivision: str
+    raw: str
+
+
 # Standalone unit token: "U A228", "U 101", "U 19" (not the U in "P.U.D." - the
 # dot after U breaks \s+; not "UNIT" inside subdivision names).
 _UNIT_TOKEN = re.compile(r"(?:^|\s)U\s+[A-Z0-9]")
@@ -134,6 +146,54 @@ def parse_legal_namebased(legal: str) -> Union[ParsedNameLegal, ReviewRecord]:
         return ReviewRecord("missing_fields", raw, detail="missing: subdivision name")
 
     return ParsedNameLegal(
+        lot=lot_m.group(1),
+        block=blk_m.group(1) if blk_m else None,
+        subdivision=subdivision,
+        raw=raw,
+    )
+
+
+# Case numbers never contain '/', so split at the FIRST slash - legals often do
+# ("L8/9 BLK A ...").
+_CC_SPLIT = re.compile(r"^CASE\s*#\s*([^/\s]+)\s*/\s*(.*)$")
+# L8, L84A, L8/9 (first taken), L137-139 (first taken), PARCEL 45
+_CC_LOT = re.compile(r"\b(?:L|PARCEL\s+)(\d+[A-Z]?)")
+_CC_BLK = re.compile(r"\bBLK\s+([A-Z0-9][A-Z0-9.]*)\b")
+_CC_SEC_ONLY = re.compile(r"\bSEC\s+\d")
+
+
+def parse_legal_case_comments(text: str) -> Union[ParsedCaseComments, ReviewRecord]:
+    """Parse 'CASE # {case}/{abbreviated legal}' comments (Highlands style)."""
+    raw = (text or "").strip()
+    norm = re.sub(r"\s+", " ", raw.upper())
+    if not norm:
+        return ReviewRecord("empty", raw)
+
+    split = _CC_SPLIT.match(norm)
+    if not split:
+        return ReviewRecord("missing_fields", raw, detail="no CASE #/legal structure")
+    case_number, legal = split.groups()
+
+    if _CC_SEC_ONLY.search(legal) and not _CC_LOT.search(legal):
+        return ReviewRecord("metes_and_bounds", raw)
+
+    lot_m = _CC_LOT.search(legal)
+    if not lot_m:
+        return ReviewRecord("missing_fields", raw, detail="missing: lot")
+
+    blk_m = _CC_BLK.search(legal)
+    # Subdivision = text after the last structural token (block if present,
+    # otherwise the full lot clause incl. PT L9 / /9 / -139 continuations).
+    tail_start = blk_m.end() if blk_m else lot_m.end()
+    subdivision = legal[tail_start:]
+    subdivision = re.sub(r"^[/0-9A-Z-]*?\s", "", subdivision + " ").strip() \
+        if re.match(r"^[/-]", subdivision) else subdivision.strip()
+    subdivision = re.sub(r"^(PT\s+L?\d+[A-Z]?(/\d+)?\s+)+", "", subdivision).strip(" .,")
+    if not subdivision:
+        return ReviewRecord("missing_fields", raw, detail="missing: subdivision name")
+
+    return ParsedCaseComments(
+        case_number=case_number,
         lot=lot_m.group(1),
         block=blk_m.group(1) if blk_m else None,
         subdivision=subdivision,

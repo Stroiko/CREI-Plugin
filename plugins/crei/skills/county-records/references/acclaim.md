@@ -54,7 +54,33 @@ Record Date, Case Number, …).
    **GOTCHA (verified, Brevard prior recon):** a 503 was once logged while
    the file still downloaded fine. Judge success by the file's content.
 
-## CSV schema (identical across verified counties)
+## Two UI generations, one backend
+
+- **Classic** (Brevard, Pinellas, Broward): disclaimer gate → "I accept the
+  conditions above." → search tiles; Telerik autocomplete `#DocTypesDisplay-input`,
+  date fields `#RecordDateFrom`/`#RecordDateTo`; Search is a `<button>` on
+  Brevard but `<input id="btnSearch">` on Pinellas/Broward.
+- **v2 / guest-style** (Highlands, St. Lucie): no disclaimer gate ("Welcome,
+  Guest"), Kendo widgets — DocTypes is a multi-select listbox ("Select
+  DocTypes..."), dates are `#FromDatePicker`/`#ToDatePicker`.
+
+Both generations serve the SAME `Search/ExportCsv` endpoint (verified on
+Highlands), so the ingest path is unchanged — only the form-driving steps
+differ.
+
+## CSV schema — VARIES PER COUNTY (verified; do not assume)
+
+The export columns are per-deployment configuration. Four live variants seen:
+
+| County | Columns of note |
+|---|---|
+| Brevard | full set incl. `U`, `DocLegalDescription`, `CaseNumber` |
+| Pinellas | NO `U`/`Consideration`/`DocLegalDescription`/`CaseNumber`; legal rides in `Comments` |
+| Highlands | `U` present; `Comments` packs `CASE # {case}/{abbreviated legal}` |
+| Broward | has `DocLegalDescription`+`CaseNumber` columns but **legals are EMPTY on lis pendens** (0/43) — no CSV join possible |
+
+Column mapping lives in each county's `csvColumns` config. The Brevard
+reference schema:
 
 ```
 U, DirectName, IndirectName, RecordDate, DocTypeDescription, BookType,

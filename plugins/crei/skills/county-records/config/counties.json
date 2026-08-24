@@ -61,5 +61,66 @@
       "detailsUrl": "https://www.pcpao.gov/property-details?s={strap}",
       "notes": "Use the Sub/Condo quick search with the subdivision NAME; recorded names may be word-reordered vs PCPAO names (e.g. 'EDGEWATER SECTION OF SHORE ACRES' is 'SHORE ACRES EDGEWATER SEC') - try variants. Results include parcel ID + legal (match block/lot). Details page shows owner, site address, mailing address, sales history - map into the normalized parcel contract."
     }
+  },
+  "highlands-fl": {
+    "displayName": "Highlands County, FL",
+    "state": "FL",
+    "vendor": "acclaim-v2",
+    "regime": "open",
+    "landingUrl": "https://acclaim.highlandsclerkfl.gov/AcclaimWeb/",
+    "basePathHint": "/AcclaimWeb",
+    "docTypes": {
+      "lis_pendens": ["LP"]
+    },
+    "csvColumns": {
+      "legal": "Comments",
+      "caseNumber": null,
+      "provisional": "U",
+      "_comment": "Highlands export packs 'CASE # {case}/{legal}' into Comments; the parser extracts both."
+    },
+    "legalStyle": "case-comments",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": { "CC": "CCA", "CA": "GCA" },
+    "parcelId": {
+      "format": "assigned by HCPAO (e.g. S-20-34-29-150-1800-0080), not constructible",
+      "verified": true,
+      "verifiedDate": "2026-08-23",
+      "verifiedSamples": 3,
+      "notes": "Join verified via owner-name search + legal cross-check: WOODLAWN TERRACE L8 BLK 180, LINCOLN HEIGHTS L115, SUN N LAKE UNIT 12 L14 BLK 253 - all single exact matches with legals agreeing."
+    },
+    "appraiser": {
+      "name": "HCPAO",
+      "type": "owner-search",
+      "searchUrl": "https://www.hcpao.org/Search?id={ownerName}",
+      "notes": "Search the DEFENDANT name; result rows link to parcel detail pages showing full legal description, mailing address, sales history, DOR use code. CROSS-CHECK REQUIRED: only accept a parcel whose legal matches the recorded lot/block/subdivision; multiple owner matches without a legal match = unenriched."
+    }
+  },
+  "broward-fl": {
+    "displayName": "Broward County, FL",
+    "state": "FL",
+    "vendor": "acclaim",
+    "regime": "open",
+    "landingUrl": "https://officialrecords.broward.org/AcclaimWeb",
+    "basePathHint": "/AcclaimWeb",
+    "docTypes": {
+      "lis_pendens": ["LIS PENDENS"]
+    },
+    "csvColumns": {
+      "legal": "DocLegalDescription",
+      "caseNumber": "CaseNumber",
+      "provisional": null
+    },
+    "legalStyle": "str-subid",
+    "joinStrategy": "construct",
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "PULL-ONLY (verified 2026-08-23): the portal exports fine (43 rows) but 0/43 lis pendens carried a legal description - Broward does not index legals on LP docs, so no CSV-based join exists. Leads ship as names+cases only, or the user reads document images manually. Case numbers use CACE-YY-NNNNNN format."
+    },
+    "appraiser": {
+      "name": "BCPA",
+      "type": "unknown",
+      "notes": "bcpa.net - not mapped; no join path from the CSV to drive it."
+    }
   }
 }

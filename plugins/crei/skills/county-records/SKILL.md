@@ -47,7 +47,10 @@ list**. Every score is a sum of named signal contributions from
 The county's `joinStrategy` decides how a record becomes a parcel ID:
 **`construct`** (e.g. Brevard) builds the ID from the legal description string;
 **`subdivision-lookup`** (e.g. Pinellas) searches the appraiser by subdivision
-NAME and matches block/lot — used where legals carry names, not codes.
+NAME and matches block/lot; **`owner-lookup`** (e.g. Highlands) searches the
+appraiser by the DEFENDANT'S NAME and accepts a parcel only when its legal
+description cross-checks against the recorded lot/block/subdivision. All three
+are live-verified; the county entry says which applies.
 
 Scripts live at `${CLAUDE_SKILL_DIR}/scripts/`, configs at
 `${CLAUDE_SKILL_DIR}/config/`. Work in a scratch directory; suggested layout:
@@ -149,6 +152,19 @@ python ${CLAUDE_SKILL_DIR}/scripts/run_pipeline.py match \
 
 Matching is strict (exact lot token + block agreement + exactly one
 candidate); unmatched records ship unenriched rather than mis-joined.
+
+### Stage 2c — owner lookup (owner-lookup counties only)
+
+For each name in `work/owners.txt`, search the appraiser by the defendant's
+name (Highlands: `https://www.hcpao.org/Search?id=<name>`). For each candidate
+parcel, open its detail page and **cross-check the legal description** against
+the record's lot/block/subdivision (names may be abbreviated differently —
+"SUN'N LAKES EST SEB UNIT 12" vs "SUN N LAKE EST OF SEBRING UNIT 12" — the
+LOT and BLK numbers are the reliable anchors). Accept only a match where lot
+and block agree; zero or ambiguous candidates ship unenriched. Because you're
+already on the accepted parcel's detail page, record its normalized parcel
+contract (Stage 3) immediately, keyed by the record's **InstrumentNumber** in
+`work/parcels.json` — owner-lookup records have no parcel ID until this step.
 
 ## Stage 3 — Enrich from the appraiser (browser)
 

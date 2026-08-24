@@ -14,7 +14,8 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
-from parse_legal import parse_legal, parse_legal_namebased, ParsedLegal, ParsedNameLegal
+from parse_legal import (parse_legal, parse_legal_namebased, parse_legal_case_comments,
+                         ParsedLegal, ParsedNameLegal, ParsedCaseComments)
 from build_parcel_id import build_parcel_id
 from match_lookup import match_parcel
 from enrich import derive_signals
@@ -60,7 +61,14 @@ def cmd_parse(args):
         rows = list(csv.DictReader(f))
 
     cols = {**DEFAULT_CSV_COLUMNS, **(cfg.get("csvColumns") or {})}
-    name_based = cfg.get("legalStyle") == "name-based"
+    legal_style = cfg.get("legalStyle", "str-subid")
+    class_patterns = cfg.get("caseClassPatterns", {"CC": "-CC-", "CA": "-CA-"})
+
+    def classify(case_number):
+        for cls, pattern in class_patterns.items():
+            if pattern and pattern in case_number:
+                return cls
+        return "other"
 
     seen, records, review = set(), [], []
     for row in rows:
@@ -81,12 +89,20 @@ def cmd_parse(args):
             "provisional": ((row.get(cols["provisional"]) or "").strip().upper() == "U"
                             if cols.get("provisional") else False),
         }
-        base["case_class"] = ("CC" if "-CC-" in base["case_number"]
-                              else "CA" if "-CA-" in base["case_number"] else "other")
+        base["case_class"] = classify(base["case_number"])
 
-        if name_based:
+        if legal_style == "name-based":
             parsed = parse_legal_namebased(base["legal"])
             if isinstance(parsed, ParsedNameLegal):
+                base.update(parcel_id=None, lot=parsed.lot, block=parsed.block,
+                            subdivision=parsed.subdivision)
+                records.append(base)
+                continue
+        elif legal_style == "case-comments":
+            parsed = parse_legal_case_comments(base["legal"])
+            if isinstance(parsed, ParsedCaseComments):
+                base["case_number"] = parsed.case_number
+                base["case_class"] = classify(parsed.case_number)
                 base.update(parcel_id=None, lot=parsed.lot, block=parsed.block,
                             subdivision=parsed.subdivision)
                 records.append(base)
@@ -107,9 +123,14 @@ def cmd_parse(args):
     (out / "parsed.json").write_text(
         json.dumps({"county": args.county, "source_csv": str(args.csv),
                     "records": records}, indent=2), encoding="utf-8")
-    if name_based:
+    strategy = cfg.get("joinStrategy", "construct")
+    if strategy == "subdivision-lookup":
         (out / "lookups.txt").write_text(
             "\n".join(sorted({r["subdivision"] for r in records})) + "\n", encoding="utf-8")
+    elif strategy == "owner-lookup":
+        (out / "owners.txt").write_text(
+            "\n".join(sorted({r["indirect_name"] for r in records if r["indirect_name"]}))
+            + "\n", encoding="utf-8")
     else:
         (out / "parcel_ids.txt").write_text(
             "\n".join(sorted({r["parcel_id"] for r in records})) + "\n", encoding="utf-8")
@@ -169,7 +190,11 @@ def cmd_score(args):
 
     leads = []
     for rec in parsed["records"]:
-        account = parcels.get(rec["parcel_id"])
+        # Owner-lookup counties key parcels.json by instrument number (no
+        # parcel ID exists until the appraiser lookup resolves one).
+        account = parcels.get(rec.get("parcel_id")) or parcels.get(rec["instrument"])
+        if account and not rec.get("parcel_id"):
+            rec["parcel_id"] = account.get("parcelID")
         rec_date = datetime.strptime(rec["record_date"], "%Y-%m-%d").date()
         age = (datetime.strptime(as_of, "%Y-%m-%d").date() - rec_date).days
         signals = derive_signals(rec["indirect_name"], account,

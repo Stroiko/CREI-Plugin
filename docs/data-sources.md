@@ -76,6 +76,33 @@ ORB 2224/1002`, often `SUBID 00` or missing S/T/R) and metes-and-bounds
 (`FROM INTERSEC OF …`). Both appeared in the live sample; route to review, never
 guess.
 
+### Pinellas (PCPAO) — VERIFIED 2026-08-23 — subdivision-lookup join
+
+- Quick Search "Sub/Condo" mode at `pcpao.gov/quick-search?qu=1`; backend POST
+  `pcpao.gov/dal/quicksearch/searchProperty` (`input=<name>&searchsort=subcondo`,
+  DataTables-style) → rows with parcel ID + legal + owner + site address.
+- Join: subdivision NAME search, then strict block/lot match on the returned
+  legal. Verified 3/3. Recorded names may be word-reordered vs PCPAO names.
+- Detail page `pcpao.gov/property-details?s=<strap>` (strap = parcel ID with
+  first three segments reversed, no dashes) shows mailing address + sales
+  history for the parcel contract.
+- Condo units NOT joinable in v1 — PCPAO condo naming diverges from recorded
+  names; routed to review.
+
+### Highlands (HCPAO) — VERIFIED 2026-08-23 — owner-lookup join
+
+- `hcpao.org/Search?id=<owner name>` → result rows (parcel ID, owner, site
+  address) linking to detail pages with full legal description, mailing
+  address, sales history.
+- Join: search the DEFENDANT name, cross-check the parcel's legal against the
+  recorded lot/block/subdivision. Verified 3/3 (single exact matches).
+
+### Broward — PULL-ONLY (verified 2026-08-23)
+
+Acclaim export works (43 rows) but 0/43 lis pendens carried a legal
+description — Broward does not index legals on LP docs. No CSV-based join;
+leads would be names/cases only.
+
 ## 3. Zillow (current listings + rent estimate)
 
 See `plugins/crei/skills/zillow/SKILL.md` — fully verified Aug 2026. Browser-only

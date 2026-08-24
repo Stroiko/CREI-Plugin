@@ -31,7 +31,8 @@ def score_lead(lead: dict, scoring_cfg: dict) -> dict:
 
     fire("lis_pendens", True,
          _recency_multiplier(cfg.get("lis_pendens", {}), lead.get("record_age_days")))
-    fire("cc_case", "-CC-" in (lead.get("case_number") or ""))
+    fire("cc_case", lead.get("case_class") == "CC"
+         or "-CC-" in (lead.get("case_number") or ""))
     fire("association_plaintiff",
          bool(_ASSOCIATION.search((lead.get("direct_name") or "").upper())))
     fire("absentee_owner", sig.get("absentee_owner"))
