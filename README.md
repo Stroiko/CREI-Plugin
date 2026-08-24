@@ -24,7 +24,7 @@ requirement, not a plugin bug.
 2. Go to **Customize → Plugins**.
 3. Click **Add → Add Marketplace**.
 4. Paste this repository's URL:
-   `https://github.com/<YOUR-ACCOUNT>/CREI_plugin`
+   `https://github.com/kjf305/CREI_plugin`
 5. Install the **CREI — Claude Real Estate Investing** plugin.
 
 ## Use it
