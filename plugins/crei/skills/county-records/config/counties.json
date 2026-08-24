@@ -179,6 +179,58 @@
       "notes": "sjcpa.gov - to be mapped during St. Johns verification."
     }
   },
+  "polk-fl": {
+    "displayName": "Polk County, FL",
+    "state": "FL",
+    "vendor": "newvision",
+    "regime": "open",
+    "landingUrl": "https://apps.polkcountyclerk.net/browserviewor/",
+    "basePathHint": "/browserviewor",
+    "docTypes": {
+      "lis_pendens": ["LP", "L PEN"]
+    },
+    "legalStyle": "name-based-subfirst",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": "SS-TT-RR-NNNNNN-BBBLLL0 (Polk PA parcel; not constructible, but lot is readable in the tail)",
+      "directPattern": "\\d{2}-\\d{2}-\\d{2}-\\d{6}-\\d{6}",
+      "verified": true,
+      "verifiedDate": "2026-08-24",
+      "verifiedSamples": 3,
+      "notes": "Join verified via polkflpa.gov owner search + legal cross-check: HAMMOCK RESERVE PHASE 1 LT 142, PRESTWICK VILLAGE LT 21 (entity owner with 2 parcels - lot tail disambiguated), GOLF MANOR LT 7. NOTE: no case numbers in the clerk grid, so cc_case cannot fire in Polk."
+    },
+    "appraiser": {
+      "name": "Polk County Property Appraiser",
+      "type": "owner-search",
+      "searchUrl": "https://www.polkflpa.gov/CamaSearch.aspx",
+      "notes": "Domain MOVED from polkpa.org to polkflpa.gov. Owner search box #searchRE_name; result rows link to /CamaDisplay.aspx?...&ParcelID=<id>. Detail shows Subdivision, Mailing Address, Sales History. Cross-check subdivision name + lot (parcel tail encodes lot*10)."
+    }
+  },
+  "osceola-fl": {
+    "displayName": "Osceola County, FL",
+    "state": "FL",
+    "vendor": "newvision",
+    "regime": "open",
+    "landingUrl": "https://officialrecords.osceolaclerk.org/browserview/",
+    "basePathHint": "/browserview",
+    "docTypes": {
+      "lis_pendens": ["LP", "LPCT"]
+    },
+    "legalStyle": "name-based-subfirst",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "BrowserView app confirmed identical to Polk 2026-08-24 (same banner/footer/tabs; doc types LP + LPCT enumerated). Export columns and join not yet verified; appraiser is property-appraiser.org (Osceola)."
+    },
+    "appraiser": {
+      "name": "Osceola Property Appraiser",
+      "type": "unknown",
+      "notes": "To be mapped during Osceola verification."
+    }
+  },
   "broward-fl": {
     "displayName": "Broward County, FL",
     "state": "FL",

@@ -16,6 +16,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 from parse_legal import (parse_legal, parse_legal_namebased, parse_legal_case_comments,
+                         parse_legal_subfirst,
                          ParsedLegal, ParsedNameLegal, ParsedCaseComments)
 from build_parcel_id import build_parcel_id
 from match_lookup import match_parcel
@@ -150,8 +151,21 @@ def cmd_parse(args):
             base["case_class"] = classify(fields["case_number"])
             records.append(base)
             continue
-        if legal_style == "name-based":
-            parsed = parse_legal_namebased(base["legal"])
+        # Some counties (Polk) put the PARCEL ID itself in the legal field -
+        # a free, exact join. Config declares the county's ID shape.
+        direct_pattern = (cfg.get("parcelId") or {}).get("directPattern")
+        if direct_pattern and re.fullmatch(direct_pattern, base["legal"]):
+            base.update(parcel_id=base["legal"], subdivision=None)
+            records.append(base)
+            continue
+
+        if legal_style in ("name-based", "name-based-subfirst"):
+            parser = (parse_legal_subfirst if legal_style == "name-based-subfirst"
+                      else parse_legal_namebased)
+            parsed = parser(base["legal"])
+            if row.get("AllDefendants"):
+                base["all_defendants"] = [n.strip() for n in
+                                          row["AllDefendants"].split(";") if n.strip()]
             if isinstance(parsed, ParsedNameLegal):
                 base.update(parcel_id=None, lot=parsed.lot, block=parsed.block,
                             subdivision=parsed.subdivision)
@@ -188,8 +202,12 @@ def cmd_parse(args):
             "\n".join(sorted({r["subdivision"] for r in records})) + "\n", encoding="utf-8")
     elif strategy == "owner-lookup":
         (out / "owners.txt").write_text(
-            "\n".join(sorted({r["indirect_name"] for r in records if r["indirect_name"]}))
+            "\n".join(sorted({r["indirect_name"] for r in records
+                              if r["indirect_name"] and not r.get("parcel_id")}))
             + "\n", encoding="utf-8")
+        direct = sorted({r["parcel_id"] for r in records if r.get("parcel_id")})
+        if direct:
+            (out / "parcel_ids.txt").write_text("\n".join(direct) + "\n", encoding="utf-8")
     else:
         (out / "parcel_ids.txt").write_text(
             "\n".join(sorted({r["parcel_id"] for r in records})) + "\n", encoding="utf-8")

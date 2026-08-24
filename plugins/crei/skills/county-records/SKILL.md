@@ -96,6 +96,12 @@ Two vendors have verified handlers — follow the county's `vendor` entry:
   typed; export is an **XLSX** — convert with
   `python ${CLAUDE_SKILL_DIR}/scripts/xlsx_to_csv.py in.xlsx out.csv`; the
   export carries **pre-parsed legal columns**, so parsing is nearly free)
+- **`newvision`** → `references/newvision.md` (BrowserView SPA, no CAPTCHA;
+  results are one row PER PARTY — `*` marks the plaintiff; ingest via the
+  **Print Results** page saved as text, then
+  `python ${CLAUDE_SKILL_DIR}/scripts/newvision_tsv_to_csv.py print.tsv raw.csv`;
+  no case numbers in the data. NOT the ClickOnce "SearchNG" variant — that
+  one is unautomatable.)
 
 ### CAPTCHA policy (applies everywhere)
 
