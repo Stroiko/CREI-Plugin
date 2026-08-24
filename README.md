@@ -55,16 +55,26 @@ politely against government websites.
 | `hud-fmr` | HUD Fair Market Rent (Section 8) lookup by ZIP/county from huduser.gov, incl. ZIP-level Small Area FMRs |
 | `rental-cashflow` | Monthly cash flow + DSCR under multiple rent scenarios (Zillow Rent Zestimate, HUD FMR, your own number), self-managed and property-managed side by side, every assumption explained |
 
-## County coverage (v1)
+## County coverage
 
-| County | Status |
-|---|---|
-| Brevard, FL | ✅ Fully verified end-to-end |
-| Pinellas, FL | ✅ Verified (condo units excluded for now) |
-| Highlands, FL | ✅ Verified |
-| Broward, FL | ⚠️ Records pull works; county doesn't index legals on lis pendens, so no ownership join |
-| Other open-Acclaim counties | Claude can attempt them and will verify the parcel join before trusting it |
-| Tyler / login-gated counties | ❌ Not automated — the plugin will tell you upfront |
+Four record systems have verified handlers: **Acclaim** (Harris), **Landmark
+Web** (Catalis/Pioneer), **NewVision BrowserView**, and **Tyler
+Self-Service**. Some sites put a CAPTCHA in the flow — Claude fills
+everything in and asks you for the one "I'm not a robot" click; it never
+tries to bypass them.
+
+| County | System | Status |
+|---|---|---|
+| Brevard, FL | Acclaim | ✅ Fully verified end-to-end |
+| Pinellas, FL | Acclaim | ✅ Verified (condo units excluded for now) |
+| Highlands, FL | Acclaim | ✅ Verified |
+| Palm Beach, FL | Landmark | ✅ Verified — one CAPTCHA click per search |
+| Orange, FL | Tyler Self-Service | ✅ Verified — one CAPTCHA click per session |
+| Polk, FL | NewVision | ✅ Verified — no CAPTCHA (case numbers unavailable in this county's data) |
+| Broward, FL | Acclaim | ⚠️ Records pull works; the county doesn't index legals on lis pendens, so no ownership join |
+| Osceola, St. Johns, Escambia, Clay, Hernando, Lee, FL | NewVision / Landmark | 🔜 Portals confirmed on supported systems; parcel matching not yet verified — leads ship unenriched until it is (Lee also sits behind an extra bot challenge) |
+| Other counties on the four supported systems | — | Claude classifies the portal, pulls records, and verifies the parcel join before trusting it |
+| Login-gated or unsupported systems | — | ❌ Not automated — the plugin tells you upfront instead of failing quietly |
 
 Scoring weights live in the skill's `config/scoring.json` — ask Claude to
 show or adjust them; every lead's score is the visible sum of its signals.
@@ -80,8 +90,8 @@ show or adjust them; every lead's score is the visible sum of its signals.
 - Keep exported record files private. Don't commit them to repos or show them
   on stream/screen recordings.
 - The plugin never creates accounts, never logs in, and never enters payment
-  information on county sites, and it stops at any CAPTCHA rather than
-  bypassing it.
+  information on county sites. CAPTCHAs are completed by *you* when a site
+  presents one — the plugin never attempts to solve or bypass them.
 
 ## For developers
 
