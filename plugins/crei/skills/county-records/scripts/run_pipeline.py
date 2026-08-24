@@ -10,6 +10,7 @@ as parcels.json (null for parcels that returned no match).
 import argparse
 import csv
 import json
+import re
 import sys
 from datetime import date, datetime
 from pathlib import Path
@@ -25,7 +26,46 @@ DEFAULT_CSV_COLUMNS = {
     "legal": "DocLegalDescription",
     "caseNumber": "CaseNumber",
     "provisional": "U",
+    "recordDate": "RecordDate",
+    "directName": "DirectName",
+    "indirectName": "IndirectName",
+    "instrument": "InstrumentNumber",
+    "docType": "DocTypeDescription",
 }
+
+_LANDMARK_CASE = re.compile(r"Case Number:\s*([A-Z0-9-]{6,})")
+
+
+def landmark_fields(row):
+    """Extract lead fields from one converted Landmark export row.
+
+    Landmark ships the legal PRE-PARSED in columns (Lot/Block/Unit/
+    Subdivision/Section/Township/Range); the free-text Legal column carries
+    the case number. Units parse like lots because owner-lookup joins don't
+    depend on lot/block matching."""
+    lot = (row.get("Lot") or "").strip()
+    unit = (row.get("Unit") or "").strip()
+    subdivision = (row.get("Subdivision") or "").strip()
+    defendants = [n.strip() for n in (row.get("Reverse Name") or "").split("\n") if n.strip()]
+
+    case_m = _LANDMARK_CASE.search(row.get("Legal") or "")
+    fields = {
+        "lot": lot or unit or None,
+        "is_unit": bool(unit and not lot),
+        "block": (row.get("Block") or "").strip() or None,
+        "subdivision": subdivision or None,
+        "section": (row.get("Section") or "").strip() or None,
+        "township": (row.get("Township") or "").strip() or None,
+        "range": (row.get("Range") or "").strip() or None,
+        "case_number": case_m.group(1) if case_m else "",
+        "provisional": (row.get("Status") or "").strip().upper() != "V",
+        "indirect_name": defendants[0] if defendants else "",
+        "all_defendants": defendants,
+        "review": None,
+    }
+    if not fields["lot"] and not fields["subdivision"]:
+        fields["review"] = "missing_fields"
+    return fields
 
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
 
@@ -72,7 +112,7 @@ def cmd_parse(args):
 
     seen, records, review = set(), [], []
     for row in rows:
-        instrument = (row.get("InstrumentNumber") or "").strip()
+        instrument = (row.get(cols["instrument"]) or "").strip()
         if instrument and instrument in seen:
             continue
         seen.add(instrument)
@@ -80,10 +120,10 @@ def cmd_parse(args):
         case_number = (row.get(cols["caseNumber"]) or "").strip() if cols.get("caseNumber") else ""
         base = {
             "instrument": instrument,
-            "record_date": (parse_record_date(row.get("RecordDate")) or date.min).isoformat(),
-            "doc_type": (row.get("DocTypeDescription") or "").strip(),
-            "direct_name": (row.get("DirectName") or "").strip(),
-            "indirect_name": (row.get("IndirectName") or "").strip(),
+            "record_date": (parse_record_date(row.get(cols["recordDate"])) or date.min).isoformat(),
+            "doc_type": (row.get(cols["docType"]) or "").strip(),
+            "direct_name": (row.get(cols["directName"]) or "").strip(),
+            "indirect_name": (row.get(cols["indirectName"]) or "").strip(),
             "case_number": case_number,
             "legal": (row.get(cols["legal"]) or "").strip(),
             "provisional": ((row.get(cols["provisional"]) or "").strip().upper() == "U"
@@ -91,6 +131,25 @@ def cmd_parse(args):
         }
         base["case_class"] = classify(base["case_number"])
 
+        if legal_style == "landmark-columns":
+            fields = landmark_fields(row)
+            if fields["review"]:
+                review.append({**row, "review_reason": fields["review"]})
+                continue
+            base.update(
+                parcel_id=None,
+                lot=fields["lot"], block=fields["block"],
+                subdivision=fields["subdivision"], is_unit=fields["is_unit"],
+                section=fields["section"], township=fields["township"],
+                range=fields["range"],
+                case_number=fields["case_number"],
+                provisional=fields["provisional"],
+                indirect_name=fields["indirect_name"],
+                all_defendants=fields["all_defendants"],
+            )
+            base["case_class"] = classify(fields["case_number"])
+            records.append(base)
+            continue
         if legal_style == "name-based":
             parsed = parse_legal_namebased(base["legal"])
             if isinstance(parsed, ParsedNameLegal):
