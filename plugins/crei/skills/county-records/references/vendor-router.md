@@ -1,0 +1,72 @@
+# Vendor router — classify the county's record system, then route
+
+Run this whenever the county is not in `config/counties.json`, or a known
+county's portal doesn't look like its config says it should (counties migrate
+vendors). Classify in three steps: VENDOR → REGIME → DATA CAPABILITY. Never
+assume; each step is observable in under a minute.
+
+## Step 1 — find the portal
+
+Search for "<county> county clerk official records search" and follow the
+county clerk's own link to their records search. Ignore third-party
+aggregators (searchsystems, myfloridacounty, etc.) — go to the county's
+system itself.
+
+## Step 2 — classify the VENDOR (fingerprints, all verified live)
+
+| Vendor | You will see | Route |
+|---|---|---|
+| **Acclaim classic** | Disclaimer page with an "I accept the conditions above." button; search tiles (Name, Book/Page, Document Type…); footer "Acclaim, is a registered trademark of Harris Recording Solutions" | This skill, classic flow (`references/acclaim.md`) |
+| **Acclaim v2** | "Welcome, Guest" header, NO disclaimer gate; tile menu; footer "Copyright 1999–20xx. Harris Recording Solutions"; Kendo widgets (DocTypes multi-select "Select DocTypes...", `#FromDatePicker`/`#ToDatePicker`) | This skill, v2 flow (`references/acclaim.md`) — same `Search/ExportCsv` backend |
+| **Tyler Eagle** | `countygovernmentrecords.com` or state-branded Tyler domains; "You must register to conduct document searches" | STOP: tell the user their county requires a personal account; never register for them |
+| **Custom / other** (Kofile, Catalis, i3 Verticals, in-house systems like Manatee's "Public Records Hub" / MCCCC) | Anything without the Harris/Acclaim marks | Not supported for automation yet. Tell the user plainly, note the vendor name for future support, and offer the Zillow skill as the available alternative |
+
+A county could theoretically run Acclaim behind a mandatory login — regime is
+per-deployment, so always confirm Step 3.
+
+## Step 3 — classify the ACCESS REGIME
+
+- **Open**: you reach a search form anonymously (after the disclaimer on
+  classic). → proceed.
+- **Gated**: any path bounces to a login. → tell the user upfront; at most
+  drive the search after they log in themselves. Never create accounts or
+  enter payment.
+
+## Step 4 — classify the DATA CAPABILITY (from the CSV itself)
+
+Same vendor ≠ same data. Pull a small recent lis pendens window (2–3 days)
+and read the export — the CSV content tells you exactly which pipeline route
+applies:
+
+| What the legal field contains | Classification | Route |
+|---|---|---|
+| `LT 22 BLK 1138 PB 16 PG 19 … S 33 T 29 R 37 SUBID GT` (STR + SUBID codes) | `str-subid` | `construct` strategy — but the ID format must be verified per county before use |
+| `LOT 4 BLOCK A PINELLE PARTIAL REPLAT` (plain-English name) | `name-based` | `subdivision-lookup` strategy via the county appraiser's subdivision search |
+| `CASE # 26-413-GCAXMX/L8 PT L9 BLK 180 WOODLAWN TERRACE` (case + abbreviated legal packed together) | `case-comments` | `owner-lookup` strategy via the appraiser's owner search + legal cross-check |
+| Empty on every lis pendens row | pull-only | Deliver names/dates/cases honestly; say ownership enrichment isn't possible from this county's index (Broward pattern) |
+
+Also note WHICH column carries the legal (`DocLegalDescription` vs
+`Comments`) and whether `U`/`CaseNumber` columns exist — the column layout is
+per-deployment configuration, not a vendor constant. Four live variants are
+documented in `references/acclaim.md`.
+
+## Step 5 — write it down, then verify before trusting joins
+
+Add what you classified to `config/counties.json` (vendor, regime, landing
+URL, base path, doc-type codes, `csvColumns`, `legalStyle`, `joinStrategy`)
+with `"verified": false`. Records can be PULLED immediately; **joins may not
+be trusted until the per-county verification procedure passes** (3+ real
+records resolved to single exact parcels — see `references/acclaim.md`
+§ Verifying a new county). Until then, leads ship unenriched with a clear
+note to the user.
+
+## What to tell the user, by outcome
+
+- Verified county → run the pipeline.
+- Open Acclaim, unverified → "I can pull the filings now; give me a few extra
+  minutes to verify the property-matching for your county before I trust it."
+- Pull-only → "Your county doesn't publish property identifiers on these
+  filings; you'll get names, dates and case numbers only."
+- Gated / Tyler → "Your county requires a personal account; I can't automate
+  that, but I can walk you through searching manually."
+- Unknown vendor → "Not supported yet" + record the fingerprint.

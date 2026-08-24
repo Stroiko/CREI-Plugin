@@ -1,5 +1,10 @@
 # Vendor router — fingerprints, regimes, and branch logic
 
+> The canonical, user-shipped copy of this logic lives INSIDE the skill at
+> [`plugins/crei/skills/county-records/references/vendor-router.md`](../plugins/crei/skills/county-records/references/vendor-router.md)
+> — that's what installed users' Claude reads. This file is the repo-side
+> record with the verification evidence. Keep them in sync.
+
 All entries verified live 2026-08-23 unless noted. The router's job: given a
 county, tell the user upfront whether the pipeline can run there.
 

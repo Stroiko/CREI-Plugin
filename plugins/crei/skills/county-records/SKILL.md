@@ -57,34 +57,33 @@ Scripts live at `${CLAUDE_SKILL_DIR}/scripts/`, configs at
 `work/raw.csv`, `work/parsed.json`, `work/review.csv`, `work/parcels.json`,
 `work/leads.csv`.
 
-## Stage 0 — Route the county
+## Stage 0 — Classify the record system, then route
 
-Look up the county in `config/counties.json`.
+Never assume which record system a county runs — **classify it, then route.**
+
+Look up the county in `config/counties.json`:
 
 - **Found, `"verified": true`** → follow its entry (base URL, doc-type codes,
-  parcel ID format). Proceed to Stage 1.
-- **Found, `"verified": false`** → the portal flow works but the parcel-ID
-  join is unverified there. Tell the user leads will ship without appraiser
-  enrichment unless you verify 2–3 parcel constructions first (see
+  join strategy). Proceed to Stage 1. If the portal doesn't match what the
+  config describes (counties migrate vendors), fall through to classification.
+- **Found, `"verified": false`** → the portal flow works but the parcel join
+  is unverified there. Tell the user leads will ship without appraiser
+  enrichment unless you verify 3 real parcel joins first (procedure in
   `references/acclaim.md` § Verifying a new county).
-- **Not found** → run the vendor router below, then offer to proceed (Acclaim
-  open) or explain the limitation (gated/unknown vendor).
+- **Not found** → run the full classification in
+  `references/vendor-router.md`: fingerprint the VENDOR (Acclaim classic /
+  Acclaim v2 / Tyler / custom), detect the ACCESS REGIME (open vs gated —
+  per deployment, never per vendor), then classify the DATA CAPABILITY from a
+  small test pull — the CSV's legal-field content tells you which parser
+  style and join strategy apply (`str-subid` → construct, `name-based` →
+  subdivision-lookup, `case-comments` → owner-lookup, empty → pull-only).
+  Record the new county in `config/counties.json` as unverified, and tell
+  the user what was classified and what that means for their leads.
 
-### Vendor router
-
-Load the county's official records search page (find it via the county clerk's
-website) and fingerprint:
-
-| Vendor | Fingerprint | Automatable? |
-|---|---|---|
-| Acclaim (Harris) | Footer: "Acclaim, is a registered trademark of Harris Recording Solutions" | Yes, if open — this skill |
-| Tyler Eagle | `countygovernmentrecords.com` or Tyler footer | No — login-gated; user must register themselves |
-| Kofile / Catalis / i3 Verticals | vendor branding | Not supported yet |
-
-Then detect the **access regime** (per deployment, not per vendor): if
-accepting the disclaimer reaches a search form anonymously, it's open. If the
-entry path bounces to a mandatory login, it's gated — say so upfront and stop;
-at most drive the search after the user logs in themselves.
+Hard rules regardless of classification outcome: gated portals mean the user
+logs in themselves or we stop — never register or pay; unknown vendors mean
+"not supported yet," said plainly, never improvised scraping of a system this
+skill has no map for.
 
 ## Stage 1 — Pull the records (Acclaim, browser)
 
