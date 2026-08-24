@@ -27,25 +27,43 @@ Prompt: *"Check Zillow for foreclosure listings in Orlando from the last 7 days.
 - [ ] Reads the header result count (not the tab title)
 - [ ] Returns structured listing data, no CAPTCHA bypass attempts
 
-## Test 3 — full Brevard pipeline (the product)
+## Test 3 — county records pull (the core capability under test)
 
-Prompt: *"Find motivated sellers in Brevard County, FL from the last two weeks
-and score the leads."*
+This is the pass/fail heart of the acceptance run: does the skill trigger on
+a natural request and drive the county portal to a real CSV in the user's
+runtime? Scoring/enrichment are NOT part of this test.
 
-Watch for each stage:
+Try each prompt in a fresh chat:
 
-- [ ] Portal: disclaimer accepted, doc types enumerated (LP + LP1), dates
-      typed (not scripted), search run within the released-through date
-- [ ] Export: CSV downloaded and handed into the sandbox (note HOW the file
-      crosses the browser→sandbox boundary — this is the step we could not
-      rehearse outside Cowork; if Claude gets stuck here, the fix belongs in
-      SKILL.md Stage 1 step 7)
-- [ ] Parse: reports N parsed / M review with reasons
-- [ ] Enrich: BCPAO API navigated serially, visible ~1–2s pacing
-- [ ] Score: ranked leads + summary presented; a top lead's score is
-      explained signal-by-signal when asked "why did #1 score that?"
-- [ ] Ask "why didn't record X get enriched?" — answer should reference the
-      review file or ambiguous-match rule, not hand-wave
+- *"Find motivated sellers in Brevard County, FL from the last two weeks."*
+- *"Find me liens in Brevard County."*
+
+Watch for:
+
+- [ ] The `county-records` skill triggers on the phrasing (no need to name
+      the skill)
+- [ ] Portal: Brevard Acclaim reached, disclaimer accepted, doc types
+      enumerated via the autocomplete (LP + LP1), dates typed (not scripted),
+      search kept within the released-through banner date
+- [ ] Results grid appears; Claude clicks **Export to CSV**
+- [ ] The CSV actually reaches Claude's working context (note HOW the file
+      crosses the browser→sandbox boundary — this is the one step we could
+      not rehearse outside Cowork; if Claude gets stuck here, the fix belongs
+      in SKILL.md Stage 1 step 7)
+- [ ] Claude reports what it pulled (row count, date window) truthfully
+- [ ] Pacing stays polite (~2–3s between actions, no hammering)
+
+**Pass = a real, current Brevard lis pendens CSV in hand, obtained through
+the skill.** Anything Claude does after that (parse/score) is a bonus at this
+stage, not a requirement.
+
+## Test 3b — full pipeline (optional, after Test 3 passes)
+
+When you're ready to exercise the whole product: let the run continue through
+parse → BCPAO enrichment (serial, ~1–2s pacing) → scoring, and check that a
+top lead's score is explained signal-by-signal when you ask "why did #1 score
+that?" and that unenriched records are explained via the review file /
+ambiguous-match rule. Not a blocker for v1 tagging if Test 3 passes.
 
 ## Test 4 — honest failure modes
 
