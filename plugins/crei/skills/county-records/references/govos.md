@@ -51,7 +51,9 @@ index books only — never a lead source.
    parties with GRANTOR/GRANTEE labels, instrument date, page count, and the
    **document image viewable anonymously** page-by-page — useful for manual
    review of survey/metes-and-bounds records. **No case numbers anywhere** in
-   the index, so the `cc_case` scoring signal cannot fire in GovOS counties.
+   the index — but distress type is now read from the plaintiff NAME (the
+   plaintiff-type classifier), which fires here as everywhere, so the missing
+   case number no longer costs a scoring signal.
 
 Politeness rules apply (serial requests, 2–3s between actions).
 

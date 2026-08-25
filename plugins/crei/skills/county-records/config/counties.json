@@ -198,7 +198,7 @@
       "verified": true,
       "verifiedDate": "2026-08-24",
       "verifiedSamples": 3,
-      "notes": "Join verified via polkflpa.gov owner search + legal cross-check: HAMMOCK RESERVE PHASE 1 LT 142, PRESTWICK VILLAGE LT 21 (entity owner with 2 parcels - lot tail disambiguated), GOLF MANOR LT 7. NOTE: no case numbers in the clerk grid, so cc_case cannot fire in Polk."
+      "notes": "Join verified via polkflpa.gov owner search + legal cross-check: HAMMOCK RESERVE PHASE 1 LT 142, PRESTWICK VILLAGE LT 21 (entity owner with 2 parcels - lot tail disambiguated), GOLF MANOR LT 7. NOTE: no case numbers in the clerk grid; distress type comes from the plaintiff name (plaintiff-type classifier), so no scoring signal is lost."
     },
     "appraiser": {
       "name": "Polk County Property Appraiser",
@@ -278,7 +278,7 @@
     "csvColumns": {
       "caseNumber": null,
       "provisional": null,
-      "_comment": "Columns come from transcribing the results grid (see references/govos.md): standard names. No case numbers in GovOS data - cc_case cannot fire. Town column carries the municipality."
+      "_comment": "Columns come from transcribing the results grid (see references/govos.md): standard names. No case numbers in GovOS data; distress type comes from the plaintiff name (plaintiff-type classifier). Town column carries the municipality."
     },
     "legalStyle": "govos-labeled",
     "joinStrategy": "owner-lookup",
@@ -591,7 +591,7 @@
       "legal": "DocLegalDescription",
       "caseNumber": null,
       "provisional": null,
-      "_comment": "Grid transcription (no CSV export; 'Results List' free copy prints a report). Columns: Instrument #, Book-Page, Date Filed (=RecordDate), Doc Type, Party Name/Reverse Party Name, Legal, Status. Parties are tagged '[R] {plaintiff} [E] {defendant}' - split so DirectName=[R] (plaintiff: lender/HOA), IndirectName=[E] (defendant/owner=lead). STANDARD orientation. Strip trailing '(+)' (more-parties/legals marker) from all fields. No case numbers - cc_case cannot fire. ~18 LP+LPFAM per 4 weeks."
+      "_comment": "Grid transcription (no CSV export; 'Results List' free copy prints a report). Columns: Instrument #, Book-Page, Date Filed (=RecordDate), Doc Type, Party Name/Reverse Party Name, Legal, Status. Parties are tagged '[R] {plaintiff} [E] {defendant}' - split so DirectName=[R] (plaintiff: lender/HOA), IndirectName=[E] (defendant/owner=lead). STANDARD orientation. Strip trailing '(+)' (more-parties/legals marker) from all fields. No case numbers; distress type comes from the plaintiff name (plaintiff-type classifier), and LPFAM doc types flag family matters directly. ~18 LP+LPFAM per 4 weeks."
     },
     "legalStyle": "name-based-subfirst",
     "joinStrategy": "owner-lookup",

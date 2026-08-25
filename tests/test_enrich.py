@@ -51,14 +51,15 @@ def test_out_of_state_is_also_absentee():
     assert s["absentee_owner"] and s["out_of_state_owner"]
 
 
-def test_entity_owner_detected_from_defendant_name():
+def test_entity_owner_is_small_investor():
+    # A single LLC on an ordinary residential parcel is the tired-landlord path.
     s = derive_signals("3ELEVEN LLC", account(owner="3ELEVEN LLC"), "FL", AS_OF)
-    assert s["entity_owned"]
+    assert s["owner_profile"] == "SMALL_INVESTOR"
 
 
-def test_individual_owner_not_entity():
+def test_individual_owner_profile():
     s = derive_signals("DOE, JOHN", account(), "FL", AS_OF)
-    assert not s["entity_owned"]
+    assert s["owner_profile"] == "INDIVIDUAL"
 
 
 def test_long_tenure():

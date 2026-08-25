@@ -56,9 +56,9 @@ condos `BAHAMA BAY PHASE 35 UN 35302`. Some legals ARE the parcel ID
 joins. Live Polk result: 74/79 documents parsed (4 direct parcels; reviews
 were metes-and-bounds + one county typo).
 
-**Known gap:** the grid carries NO case numbers, so the `cc_case` scoring
-signal cannot fire in NewVision counties. `association_plaintiff` still works
-from the plaintiff name.
+**Note:** the grid carries NO case numbers. Distress type is read from the
+plaintiff NAME (the plaintiff-type classifier — association / lender /
+government / individual), so the missing case number costs no scoring signal.
 
 ## Join (Polk — verified 3/3)
 
