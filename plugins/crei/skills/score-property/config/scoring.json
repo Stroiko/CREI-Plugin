@@ -1,0 +1,65 @@
+{
+  "_comment": "Multi-lens deal scorecard. Each lens is 0-100 (a sum of named contributions clamped to cap); its CONFIDENCE reflects which INPUTS fired, never the score value. The overall tier is a best-available read of the three lenses, never a blend. Every weight is editable; scripts never hardcode them. Mirrors the explainable ethos of county-records scoring.",
+
+  "cashflow": {
+    "_comment": "Reuses rental-cashflow's DSCR + monthly cash flow (self_managed). Anchor rent is the first available in anchorPriority - default underwrites to realistic market rent (user estimate, then Zillow), with Section 8 (hud_fmr) as the conservative fallback. Flip to ['hud_fmr', ...] for a voucher-focused screen.",
+    "anchorPriority": ["user_estimate", "zillow_rent_zestimate", "hud_fmr"],
+    "dscrWeight": 60,
+    "cashflowWeight": 40,
+    "dscrFloor": 0.90,
+    "dscrPass": 1.20,
+    "dscrStrong": 1.50,
+    "dscrPassFraction": 0.6,
+    "cashflowFloorMonthly": -100,
+    "cashflowFullAtMonthly": 400,
+    "cap": 100
+  },
+
+  "margin": {
+    "_comment": "Built-in equity from list price vs value. Value is ARV if supplied, else the Zillow Zestimate. Zestimate is suppressed on distressed listings - never treat a null value as $0; the lens returns NONE and asks for an ARV.",
+    "valuePriority": ["arv", "zestimate"],
+    "marginFloorRatio": -0.05,
+    "marginFullRatio": 0.25,
+    "suppressionStatuses": ["FORECLOSURE", "PRE_FORECLOSURE", "AUCTION"],
+    "cap": 100
+  },
+
+  "motivation": {
+    "_comment": "Layered. Layer 1 (listing signals) is universal from Zillow. Layer 2 (distress) reuses the two-axis engine and fires only when a lis pendens + CAD data are supplied (a property that came from a county-records lead). Layer 2 replaces Layer 1 when present.",
+    "listingSignals": {
+      "daysOnMarket": [
+        { "minDays": 90, "points": 25 },
+        { "minDays": 60, "points": 15 },
+        { "minDays": 30, "points": 8 }
+      ],
+      "statusPoints": { "FORECLOSURE": 30, "PRE_FORECLOSURE": 30, "AUCTION": 25 },
+      "fsboPoints": 15,
+      "priceCutPoints": 15
+    },
+    "distress": {
+      "_comment": "Copied from county-records/config/scoring.json motivation block so this skill stays self-contained (no cross-skill imports).",
+      "plaintiffType": {
+        "FAMILY": 55, "GOVERNMENT": 42, "ASSOCIATION": 38,
+        "INDIVIDUAL": 30, "LENDER": 24, "UNKNOWN": 30
+      },
+      "recencyMultipliers": [
+        { "maxAgeDays": 7, "multiplier": 1.0 },
+        { "maxAgeDays": 30, "multiplier": 0.9 },
+        { "maxAgeDays": 90, "multiplier": 0.7 },
+        { "maxAgeDays": 99999, "multiplier": 0.5 }
+      ],
+      "familyMedNudge": 12,
+      "ownerOccupancy": { "OCCUPANT": 20, "ABSENTEE_SMALL_INVESTOR": 8 },
+      "outOfStateAddon": 4,
+      "longTenure": { "minYears": 10, "points": 6 },
+      "institutionalFloor": 0
+    },
+    "cap": 100
+  },
+
+  "tiers": {
+    "_comment": "A = two lenses strong. B = one lens strong (a single available lens caps here). C = all-middling. D = a DISQUALIFYING cashflow/margin failure with no strong lens to offset. A weak MOTIVATION never disqualifies - it only promotes. A missing lens is skipped, never scored 0, never buries the tier.",
+    "strongBand": { "cashflow": 65, "margin": 60, "motivation": 55 },
+    "failBand": { "cashflow": 25, "margin": 1 }
+  }
+}

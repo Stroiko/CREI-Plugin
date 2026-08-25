@@ -1,0 +1,15 @@
+{
+  "address": "100 Rental Rd, Palm Bay, FL 32905",
+  "cashflow": {
+    "available": true,
+    "rent_grounded": true,
+    "scenarios": {
+      "user_estimate": {"dscr": 1.45, "cash_flow": 300}
+    }
+  },
+  "listing": {"available": true, "price": 250000, "zestimate": 255000, "status": "FOR_SALE"},
+  "valuation": {},
+  "motivation": {
+    "listing_signals": {"available": true, "days_on_market": 12, "status": "FOR_SALE"}
+  }
+}
