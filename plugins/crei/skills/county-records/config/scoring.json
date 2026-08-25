@@ -1,48 +1,55 @@
 {
-  "_comment": "Weighted, explainable lead scoring. Each signal that fires contributes its weight (times any multiplier) to the score; leads.csv shows every contribution. Edit weights freely - scripts never hardcode them.",
-  "signals": {
-    "lis_pendens": {
-      "weight": 40,
-      "description": "A lis pendens was recorded against the property",
-      "recencyMultipliers": [
-        { "maxAgeDays": 7, "multiplier": 1.0 },
-        { "maxAgeDays": 30, "multiplier": 0.8 },
-        { "maxAgeDays": 90, "multiplier": 0.5 },
-        { "maxAgeDays": 99999, "multiplier": 0.3 }
-      ]
+  "_comment": "Two-axis, explainable lead scoring. MOTIVATION (0-100) = call-order priority knowable from the filing + owner profile; always available, even on unenriched leads. EQUITY (0-100) = deal-margin PROXY measured from CAD enrichment (no lien balance exists anywhere, so equity is a proxy, never a computed dollar figure); null with a confidence flag when the join refuses. TIER (A/B/C/D + A_UNVERIFIED) comes from the motivation x equity matrix. Every weight here is editable; scripts never hardcode them.",
+
+  "motivation": {
+    "_comment": "Distress TYPE folds in competition + thin-equity priors (decision: motivation is net call-order, not pure willingness). Family/partition tops the list; lender foreclosure is folded down for auction competition + thin equity. A HIGH-confidence family match PROMOTES the distress type to FAMILY (uses the 40 base); a MED match keeps the INDIVIDUAL base and adds familyMedNudge. Recency scales the distress base only. Institutional owners are floored regardless of what else fires.",
+    "plaintiffType": {
+      "FAMILY": 55,
+      "GOVERNMENT": 42,
+      "ASSOCIATION": 38,
+      "INDIVIDUAL": 30,
+      "LENDER": 24,
+      "UNKNOWN": 30
     },
-    "cc_case": {
-      "weight": 20,
-      "description": "County Civil (-CC-) case: HOA/condo lien, small dollar amount against a (typically) high-equity owner; low investor competition"
+    "recencyMultipliers": [
+      { "maxAgeDays": 7, "multiplier": 1.0 },
+      { "maxAgeDays": 30, "multiplier": 0.9 },
+      { "maxAgeDays": 90, "multiplier": 0.7 },
+      { "maxAgeDays": 99999, "multiplier": 0.5 }
+    ],
+    "familyMedNudge": 12,
+    "ownerOccupancy": {
+      "_comment": "Occupant homestead = relocation stress (strong). Absentee small-investor = tired landlord (weak). Institutional = neither (floored).",
+      "OCCUPANT": 20,
+      "ABSENTEE_SMALL_INVESTOR": 8
     },
-    "association_plaintiff": {
-      "weight": 10,
-      "description": "Plaintiff is an HOA/condo/community association (name contains ASSN/ASSOCIATION/HOA/CONDOMINIUM)"
+    "outOfStateAddon": 4,
+    "longTenure": { "minYears": 10, "points": 6 },
+    "institutionalFloor": 0,
+    "cap": 100
+  },
+
+  "equity": {
+    "_comment": "Weighted average of the scaled evidence that EXISTS (missing components are renormalized out, not scored as zero), then a plaintiff prior adjustment, clamped 0-100. Confidence: HIGH = cap-gap AND appreciation both computable; MED = one of them; LOW = tenure only; NONE = unenriched.",
+    "weights": { "capGap": 40, "appreciation": 30, "tenure": 20 },
+    "capGapFullAtRatio": 0.35,
+    "appreciationFullAtRatio": 0.50,
+    "tenureFullAtYears": 25,
+    "plaintiffPrior": {
+      "ASSOCIATION": 10,
+      "GOVERNMENT": 10,
+      "FAMILY": 8,
+      "INDIVIDUAL": 6,
+      "UNKNOWN": 0,
+      "LENDER": -15
     },
-    "absentee_owner": {
-      "weight": 15,
-      "description": "Owner mailing address differs from the property's site address"
-    },
-    "out_of_state_owner": {
-      "weight": 10,
-      "description": "Owner mailing address is outside the property's state"
-    },
-    "entity_owned": {
-      "weight": 5,
-      "description": "Owner is an entity (LLC/INC/TRUST/CORP), not an individual"
-    },
-    "long_tenure": {
-      "weight": 10,
-      "description": "Owner has held the property a long time (equity proxy)",
-      "minYears": 10
-    },
-    "vacant_land_flag": {
-      "weight": 0,
-      "description": "Property use indicates vacant land - informational column only by default; raise the weight if vacant parcels are a target"
-    },
-    "provisional_record": {
-      "weight": 0,
-      "description": "Record flagged U (recorded, not yet released) - informational; re-check after release"
-    }
+    "cap": 100
+  },
+
+  "tiers": {
+    "_comment": "A = motivated AND equity-confirmed. A_UNVERIFIED = motivated but unenriched (verify equity, don't bury). B = one axis high. C = both middling. D = weak/institutional.",
+    "motivationHigh": 55,
+    "motivationMed": 30,
+    "equityHigh": 55
   }
 }

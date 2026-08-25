@@ -12,6 +12,7 @@ import csv
 import json
 import re
 import sys
+from collections import Counter
 from datetime import date, datetime
 from pathlib import Path
 
@@ -23,6 +24,7 @@ from build_parcel_id import build_parcel_id
 from match_lookup import match_parcel
 from enrich import derive_signals
 from score import score_lead
+from classify import classify_plaintiff, detect_family_matter, resolve_parties
 
 DEFAULT_CSV_COLUMNS = {
     "legal": "DocLegalDescription",
@@ -304,6 +306,26 @@ def cmd_match(args):
     print(f"matched {matched}, unmatched {unmatched} (ship unenriched) -> {out / 'parsed.json'}")
 
 
+_TIER_ORDER = {"A": 0, "A_UNVERIFIED": 1, "B": 2, "C": 3, "D": 4}
+_TIER_MEANING = {
+    "A": "motivated + equity-confirmed — call first",
+    "A_UNVERIFIED": "motivated, equity unverified — verify then call",
+    "B": "one axis strong",
+    "C": "middling",
+    "D": "weak / institutional",
+}
+
+
+def _family_label(sig):
+    fm = sig.get("family_matter") or {}
+    return fm.get("confidence") if fm.get("value") else ""
+
+
+def _why(contrib):
+    return ", ".join(f"{k} +{v:g}" for k, v in
+                     sorted(contrib.items(), key=lambda kv: -kv[1]))
+
+
 def cmd_score(args):
     cfg = county_cfg(args.county)
     scoring = load_json(args.scoring or CONFIG_DIR / "scoring.json")
@@ -312,6 +334,7 @@ def cmd_score(args):
     as_of = args.as_of or date.today().isoformat()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
+    party_roles = cfg.get("partyRoles")
 
     leads = []
     for rec in parsed["records"]:
@@ -322,15 +345,33 @@ def cmd_score(args):
             rec["parcel_id"] = account.get("parcelID")
         rec_date = datetime.strptime(rec["record_date"], "%Y-%m-%d").date()
         age = (datetime.strptime(as_of, "%Y-%m-%d").date() - rec_date).days
-        signals = derive_signals(rec["indirect_name"], account,
-                                 cfg.get("state", ""), as_of)
+
+        # Resolve which party is the plaintiff vs the defendant/lead per the
+        # county's semantics (Bexar inverts grantor/grantee; Collin is
+        # undifferentiated) BEFORE classifying.
+        plaintiff_name, lead_name = resolve_parties(
+            rec.get("direct_name"), rec.get("indirect_name"), party_roles)
+
+        signals = derive_signals(lead_name, account, cfg.get("state", ""), as_of)
+        signals["plaintiff_type"] = classify_plaintiff(plaintiff_name)
+        signals["family_matter"] = detect_family_matter(
+            plaintiff_name, lead_name, rec.get("doc_type"),
+            rec.get("case_class"), party_roles)
+
         lead = {**rec, "record_age_days": age, "signals": signals}
         result = score_lead(lead, scoring)
         leads.append({
             **rec,
             "record_age_days": age,
-            "score": result["score"],
-            "contributions": result["contributions"],
+            "lead_name": lead_name,
+            "plaintiff_name": plaintiff_name,
+            "tier": result["tier"],
+            "motivation": result["motivation"],
+            "equity": result["equity"],
+            "equity_confidence": result["equity_confidence"],
+            "motivation_contrib": result["motivation_contrib"],
+            "equity_contrib": result["equity_contrib"],
+            "score": result["score"],  # legacy alias == motivation
             "signals": signals,
             "site_address": (account or {}).get("siteAddress"),
             "owner": (account or {}).get("owner"),
@@ -338,47 +379,57 @@ def cmd_score(args):
             "market_value": (account or {}).get("marketValue"),
         })
 
-    leads.sort(key=lambda l: l["score"], reverse=True)
+    leads.sort(key=lambda l: (_TIER_ORDER.get(l["tier"], 9), -l["motivation"]))
 
-    signal_names = [s for s in scoring["signals"] if not s.startswith("_")]
+    header = ["rank", "tier", "motivation", "equity", "equity_confidence", "lead",
+              "owner_profile", "plaintiff_type", "family_matter", "parcel_id",
+              "site_address", "record_date", "doc_type", "case_number",
+              "market_value", "last_sale_price", "assessed_gap", "tenure_years",
+              "homestead", "absentee", "out_of_state", "enriched", "why"]
     with open(out / "leads.csv", "w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["rank", "score", "lead", "parcel_id", "site_address",
-                         "case_class", "case_number", "record_date", "market_value",
-                         "tenure_years", "enriched"]
-                        + [f"contrib_{s}" for s in signal_names])
+        writer.writerow(header)
         for i, l in enumerate(leads, 1):
-            writer.writerow([i, l["score"], l["indirect_name"], l["parcel_id"],
-                             l["site_address"], l["case_class"], l["case_number"],
-                             l["record_date"], l["market_value"],
-                             l["signals"]["tenure_years"], l["signals"]["enriched"]]
-                            + [l["contributions"].get(s, 0) for s in signal_names])
+            s = l["signals"]
+            writer.writerow([
+                i, l["tier"], l["motivation"],
+                "" if l["equity"] is None else l["equity"],
+                l["equity_confidence"], l["lead_name"],
+                s.get("owner_profile"), s.get("plaintiff_type"), _family_label(s),
+                l["parcel_id"], l["site_address"], l["record_date"],
+                l.get("doc_type"), l.get("case_number"), l["market_value"],
+                s.get("last_sale_price"), s.get("assessed_gap"),
+                s.get("tenure_years"), s.get("homestead"),
+                s.get("absentee_owner"), s.get("out_of_state_owner"),
+                s.get("enriched"), _why(l["motivation_contrib"]),
+            ])
 
     (out / "leads.json").write_text(json.dumps(leads, indent=2), encoding="utf-8")
 
-    fired = {s: sum(1 for l in leads if s in l["contributions"]) for s in signal_names}
+    tier_counts = Counter(l["tier"] for l in leads)
     unenriched = sum(1 for l in leads if not l["signals"]["enriched"])
     lines = [
         f"# Lead summary — {cfg.get('displayName', args.county)}",
         "",
         f"- Leads scored: **{len(leads)}** (as of {as_of})",
-        f"- Unenriched (no appraiser match): **{unenriched}**" if unenriched else "- All leads enriched",
+        f"- Unenriched (equity unverified): **{unenriched}**",
         "",
-        "## Signal frequency",
+        "## Tier distribution",
         "",
-        "| Signal | Leads |",
-        "|---|---|",
-        *[f"| {s} | {n} |" for s, n in sorted(fired.items(), key=lambda kv: -kv[1]) if n],
+        "| Tier | Leads | Meaning |",
+        "|---|---|---|",
+        *[f"| {t} | {tier_counts[t]} | {_TIER_MEANING[t]} |"
+          for t in ["A", "A_UNVERIFIED", "B", "C", "D"] if tier_counts.get(t)],
         "",
         "## Top leads",
         "",
-        "| # | Score | Case | Why |",
-        "|---|---|---|---|",
+        "| # | Tier | Motiv | Equity | Lead | Why |",
+        "|---|---|---|---|---|---|",
     ]
-    for i, l in enumerate(leads[:10], 1):
-        why = ", ".join(f"{k} +{v:g}" for k, v in
-                        sorted(l["contributions"].items(), key=lambda kv: -kv[1]))
-        lines.append(f"| {i} | {l['score']:g} | {l['case_class']} {l['case_number']} | {why} |")
+    for i, l in enumerate(leads[:15], 1):
+        eq = "—" if l["equity"] is None else f"{l['equity']:g}"
+        lines.append(f"| {i} | {l['tier']} | {l['motivation']:g} | {eq} | "
+                     f"{l['lead_name']} | {_why(l['motivation_contrib'])} |")
     (out / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     print(f"scored {len(leads)} leads -> {out / 'leads.csv'}, {out / 'summary.md'}")

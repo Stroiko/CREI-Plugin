@@ -123,7 +123,8 @@ guess.
   Sales History.
 - Join verified 3/3 (incl. a two-parcel LLC disambiguated by the lot tail —
   parcel tail encodes lot×10).
-- Data gap: no case numbers in the clerk grid → `cc_case` signal unavailable.
+- No case numbers in the clerk grid — distress type comes from the plaintiff
+  name (plaintiff-type classifier), so no scoring signal is lost.
 
 ### Orange (OCPA) — VERIFIED 2026-08-24 — owner-lookup join (Tyler Self-Service county)
 

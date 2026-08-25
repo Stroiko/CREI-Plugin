@@ -20,9 +20,13 @@ compatibility: >
 
 Pulls fresh distress filings (lis pendens and similar) from a county's official
 records portal, parses each record's legal description into a parcel ID, joins
-county appraiser ownership data, and produces a **ranked, explainable lead
-list**. Every score is a sum of named signal contributions from
-`config/scoring.json` — "why did this score 87?" always has an exact answer.
+county appraiser ownership data, and produces a **tiered, explainable lead
+list**. Each lead gets two independent scores — a **Motivation** score (how
+badly the owner needs to sell, knowable from the filing + owner profile) and an
+**Equity** deal-margin proxy (measured from the appraiser data, blank when the
+join refuses) — and an **A/B/C/D tier** from the two. Every score is a sum of
+named contributions from `config/scoring.json`; "why is this an A?" always has
+an exact answer.
 
 **Hard boundaries — never violate:**
 - Produce the list and STOP. Never contact, skip-trace, or solicit property
@@ -257,10 +261,29 @@ python ${CLAUDE_SKILL_DIR}/scripts/run_pipeline.py score \
     --county brevard-fl --out work/
 ```
 
-Writes `work/leads.csv` + `work/leads.json` (ranked, one row per lead, with
-per-signal contribution columns) and `work/summary.md`. Signals and weights
-come from `config/scoring.json` — the user may edit weights; never hardcode
-them. Present the summary and the top leads; offer the CSV as the deliverable.
+Writes `work/leads.csv` + `work/leads.json` (sorted by tier, then motivation;
+one row per lead) and `work/summary.md`. Each lead carries two scores and a
+tier:
+
+- **Motivation (0-100)** — call-order priority from the filing + owner profile,
+  so it's present on *every* lead, even unenriched ones. Distress **type** is
+  read from the plaintiff name (`ASSOCIATION` / `LENDER` / `GOVERNMENT` /
+  `INDIVIDUAL`, honoring the county's `partyRoles`), which works on every vendor
+  including case-number-less GovOS — it replaces the old case-number-only
+  `cc_case` signal. A confidence-graded **family/divorce** detector, owner
+  **occupancy** (homestead), recency, and tenure modulate it. **Institutional**
+  owners (REITs/funds/commercial use) are floored to ~0 and flagged.
+- **Equity (0-100 + confidence)** — a deal-margin *proxy* from CAD evidence
+  (Save-Our-Homes cap-gap, appreciation vs last sale, tenure); **no lien
+  balance exists in the data, so no dollar-equity figure is invented.** Blank
+  with `equity_confidence = NONE` when the lead is unenriched.
+- **Tier** — `A` (motivated + equity-confirmed), `A_UNVERIFIED` (motivated but
+  unenriched — verify equity, don't bury), `B` (one axis strong), `C`
+  (middling), `D` (weak / institutional).
+
+Weights, plaintiff priors, and tier thresholds all live in
+`config/scoring.json` — the user may edit them; never hardcode. Present the
+summary and top tiers; offer the CSV as the deliverable.
 
 ## Error handling
 
