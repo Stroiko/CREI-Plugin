@@ -115,6 +115,12 @@ Follow the county's `vendor` entry to its verified handler:
   GET; **the Export button is login-gated — ingest by transcribing the
   results grid**, which carries full labeled-token legals; Grantee = the
   lead; no case numbers in the data.)
+- **`aumentum`** → `references/aumentum.md` (Harris "Aumentum Recorder Public
+  Access" ASP.NET, `/RealEstate/` paths; open, no CAPTCHA; doc types are a
+  checkbox list; ingest by transcribing the results grid; parties tagged
+  `[R]` plaintiff / `[E]` defendant=lead; subdivision-first legals reuse
+  `name-based-subfirst`; `PIN {digits}` legals are direct parcels via
+  directFormat; no case numbers. Verified FL only — TX deployments differ.)
 
 ### CAPTCHA policy (applies everywhere)
 

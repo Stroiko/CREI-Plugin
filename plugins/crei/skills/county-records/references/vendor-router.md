@@ -23,7 +23,7 @@ system itself.
 | **Tyler Self-Service** | Footer "© Tyler Technologies \| Version 20xx.x.x"; URL path `/ssweb/`; disclaimer page whose "I Accept" is gated by reCAPTCHA | This skill (`references/tyler-selfservice.md`) — verified OPEN on Orange FL; one human CAPTCHA click per session. Legacy `/recorder/eagleweb/` URLs often redirect here |
 | **Tyler Eagle (legacy/gated)** | `countygovernmentrecords.com` or state-branded Tyler domains; "You must register to conduct document searches" | If it bounces to login: STOP, tell the user their county requires a personal account; never register for them. If it redirects to `/ssweb`, use the Tyler Self-Service handler |
 | **GovOS Cloud Search** (Kofile→GovOS→Neumo) | Host `{county}.{st}.publicsearch.us`; title "Official Record Search - Quick Search - …"; footer "Powered By Neumo"; "Certified through MM/DD/YYYY" banner; Quick/Advanced search tabs, department picker, Index vs Full-Text (OCR) radio, "Property Alert" link | This skill (`references/govos.md`) — open, no CAPTCHA; verified on Dallas TX; ingest by reading the results grid (**Export button is login-gated — never register**). Sister site `kofilequicklinks.com/...` = historic index books only, never a lead source |
-| **Aumentum Recorder – Public Access** (Harris) | Footer "Aumentum Recorder - Public Access Web UI, Version 20xx.x.x Copyright © 2001 - 20xx Harris Recording Solutions"; disclaimer page with accept link; paths under `/RealEstate/` (e.g. `SearchEntry.aspx`) | **Recognized, no handler yet.** Open after disclaimer (Alachua FL, Travis TX via tccsearch.org, Fort Bend TX). Same message as GovOS |
+| **Aumentum Recorder – Public Access** (Harris) | Footer "Aumentum Recorder - Public Access Web UI, Version 20xx.x.x Copyright © 2001 - 20xx Harris Recording Solutions"; disclaimer page with accept link; paths under `/RealEstate/` (e.g. `SearchEntry.aspx`) | This skill (`references/aumentum.md`) — open, no CAPTCHA; verified on Alachua FL; doc types are a checkbox list; ingest by reading the results grid (parties `[R]` plaintiff / `[E]` defendant=lead). **FL verified; TX deployments (Travis, Fort Bend) have a different legal format — verify before trusting** |
 | **GSCCCA** (Georgia statewide) | `search.gsccca.org`; classic ASP paths (`/RealEstate/namesearch.asp`); footer "© 1995 - 20xx Georgia Superior Court Clerks' Cooperative Authority"; all-159-county picker | **Gated/Paid** — forms load anonymously but running any search bounces to `apps.gsccca.org/login.asp` ($5/4hr pass or subscription). This is the ONLY online route for many GA counties. Never register or pay. Offer the user-assisted route: the user logs into their own GSCCCA account, then you drive the search |
 | **Cott Systems eSearch** | Title "eSearch \| Name Search"; "Guest User" header, optional "Log in as named user"; footer "© 2007 - 20xx Cott Systems, Inc. Version 1.x.x.x"; `cotthosting.com/{st}{county}` variants land on a Login page (gated) | **Recognized, no handler yet.** Guest-open at some deployments (Forsyth GA), gated at others — regime is per-deployment, check which you got |
 | **Tyler "RE Search"** (MicroPact) | Title "RE Search"; path `/RESearch/RESearch`; footer "© 20xx Tyler Technologies v1.x.x.x"; Good-Thru dates per Deeds/Liens/Plats | **Recognized, no handler yet.** Open, free (account only for fraud alerts). Third Tyler product — do NOT confuse with Eagle (gated) or Self-Service (`/ssweb/`, has handler) |
@@ -77,9 +77,9 @@ note to the user.
   filings; you'll get names, dates and case numbers only."
 - Gated / Tyler → "Your county requires a personal account; I can't automate
   that, but I can walk you through searching manually."
-- Recognized vendor, no handler (Aumentum, Cott eSearch, Tyler RE Search) →
-  "Your county runs <vendor>, which is open for anonymous search, but
-  automation for it isn't built yet" — then offer to walk the search manually.
+- Recognized vendor, no handler (Cott eSearch, Tyler RE Search) → "Your county
+  runs <vendor>, which is open for anonymous search, but automation for it
+  isn't built yet" — then offer to walk the search manually.
 - Statewide gated system (GSCCCA in Georgia) → "Your state routes record
   searches through <system>, which requires a paid account; if you have (or
   open) one and log in yourself, I can drive the search from there."

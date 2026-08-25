@@ -151,13 +151,24 @@ def cmd_parse(args):
             base["case_class"] = classify(fields["case_number"])
             records.append(base)
             continue
-        # Some counties (Polk) put the PARCEL ID itself in the legal field -
-        # a free, exact join. Config declares the county's ID shape.
+        # Some counties put the PARCEL ID itself in the legal field - a free,
+        # exact join. Config declares the county's ID shape via `directPattern`.
+        # Polk's legal IS the parcel ID verbatim. Aumentum counties prefix it
+        # ("PIN 18812010002") and the appraiser wants it dashed (18812-010-002):
+        # `directFormat` is a numbered-group template applied to the match.
+        # A trailing "(+)" (more-parties marker) is tolerated if not stripped.
         direct_pattern = (cfg.get("parcelId") or {}).get("directPattern")
-        if direct_pattern and re.fullmatch(direct_pattern, base["legal"]):
-            base.update(parcel_id=base["legal"], subdivision=None)
-            records.append(base)
-            continue
+        if direct_pattern:
+            legal_for_direct = re.sub(r"\s*\(\+\)\s*$", "", base["legal"])
+            dm = re.fullmatch(direct_pattern, legal_for_direct)
+            if dm:
+                direct_format = (cfg.get("parcelId") or {}).get("directFormat")
+                base.update(
+                    parcel_id=(direct_format.format(*dm.groups()) if direct_format
+                               else legal_for_direct),
+                    subdivision=None)
+                records.append(base)
+                continue
 
         if legal_style in ("name-based", "name-based-subfirst", "labeled-tokens",
                            "govos-labeled"):
