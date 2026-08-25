@@ -161,6 +161,24 @@ def cmd_parse(args):
 
         if legal_style in ("name-based", "name-based-subfirst", "labeled-tokens",
                            "govos-labeled"):
+            # GovOS counties whose grid carries pre-parsed Lot/Block (and
+            # sometimes PropertyAddress) columns instead of a legal string
+            # (Bexar pattern): a row with an empty legal but usable columns is
+            # joinable, not a review case.
+            if legal_style == "govos-labeled" and not base["legal"]:
+                col_lot = (row.get("Lot") or "").strip()
+                col_block = (row.get("Block") or "").strip()
+                col_addr = (row.get("PropertyAddress") or "").strip()
+                if col_lot.upper() not in ("", "N/A") and (
+                        col_block.upper() not in ("", "N/A") or col_addr.upper() not in ("", "N/A")):
+                    base.update(parcel_id=None,
+                                lot=col_lot.upper(),
+                                block=(col_block.upper() or None) if col_block.upper() != "N/A" else None,
+                                subdivision=None)
+                    if col_addr and col_addr.upper() != "N/A":
+                        base["property_address"] = col_addr
+                    records.append(base)
+                    continue
             parser = {"name-based-subfirst": parse_legal_subfirst,
                       "labeled-tokens": parse_legal_labeled,
                       "govos-labeled": parse_legal_govos}.get(

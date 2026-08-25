@@ -69,3 +69,27 @@ def test_first_subdivision_segment_wins_over_survey():
     p = ok("Subdivision - Name: NUSSBAUMERS Lot: 10 Block: 1 Township: DALLAS "
            "Survey - Name: SOME SUR Survey: 12")
     assert p.subdivision == "NUSSBAUMERS" and p.lot == "10"
+
+
+# --- Tarrant "comma" template (real values from the live 2026-08-24 pull) ---
+
+def test_comma_template_full():
+    p = ok("FORT WORTH, Subdivision: MORNINGSIDE TERRACE, Lot: 26, Block: 1")
+    assert p.subdivision == "MORNINGSIDE TERRACE"
+    assert p.lot == "26" and p.block == "1" and p.city == "FORT WORTH"
+
+
+def test_comma_template_no_block():
+    p = ok("ARLINGTON, Subdivision: FIELD ACRES, Lot: 1R")
+    assert p.subdivision == "FIELD ACRES"
+    assert p.lot == "1R" and p.block is None and p.city == "ARLINGTON"
+
+
+def test_comma_template_alnum_block():
+    p = ok("FORT WORTH, Subdivision: LASATER, Lot: 7, Block: 46A")
+    assert p.lot == "7" and p.block == "46A"
+
+
+def test_comma_template_missing_lot_reviews():
+    r = review("SOUTHLAKE, Subdivision: STONE LAKES")
+    assert r.reason == "missing_fields" and "lot" in r.detail

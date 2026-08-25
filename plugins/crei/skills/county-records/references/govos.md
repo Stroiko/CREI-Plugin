@@ -1,9 +1,15 @@
 # GovOS Cloud Search handler — verified reference
 
-Verified live on Dallas County TX (2026-08-24, full flow + 3/3 parcel joins on
-DCAD). One uniform SPA covers Dallas, Tarrant, Bexar, Collin, Denton, Hidalgo,
-and Cameron TX — all open anonymous. All steps are user-level browser actions
-(clicks, typing, URL navigation); no CAPTCHA anywhere in the verified flow.
+Verified live 2026-08-24 with 3/3 parcel joins on **Dallas (DCAD), Tarrant
+(TAD), Bexar (BCAD), and Denton (Denton CAD)**; Collin and Hidalgo pull-verified
+(joins pending); Cameron has NO lis pendens supply in the OR index. One uniform
+SPA — all open anonymous, no CAPTCHA anywhere in the verified flows. All steps
+are user-level browser actions (clicks, typing, URL navigation).
+
+**The app is uniform; the DATA is not.** Counties differ in: legal template
+(dash vs comma), whether legals render in-grid or only on doc detail pages,
+extra pre-parsed grid columns, party-role semantics, and doc-type URL codes.
+`counties.json` records each county's answers — read its entry first.
 
 ## Fingerprint
 
@@ -95,14 +101,58 @@ review. Live Dallas result: 14/16 parsed, both reviews legitimate.
 name parties who hold title under a different name form — those legitimately
 ship unenriched after the cross-check refuses.
 
+## Per-county variation matrix (all verified live 2026-08-24)
+
+| County | LP types (URL codes) | Legal in grid? | Template | Extra grid columns | Parties | ~Vol/wk |
+|---|---|---|---|---|---|---|
+| Dallas | LIS PENDENS (`LP`), LIS PENDENS (NOTICE OF) (`LPS`) | ✓ full | dash | Town | grantor=plaintiff, grantee=lead | 16 |
+| Tarrant | LIS PENDENS (`LP`) | ✓ full | **comma** (`{CITY}, Subdivision: X, Lot: n, Block: b`) | — | grantor=plaintiff (family cases: title may sit with either party) | 8 |
+| Bexar | LIS PENDENS (`LIS PEN`) | ✗ (string empty) | — | **Lot, Block, NCB, County Block, Property Address** | **INVERTED: grantor=owner/lead**, grantee=plaintiff | 40 |
+| Collin | LIS PENDENS (`LP`) | ✗ | dash (detail page only) | — | **undifferentiated** (every party listed as both) | ~10 |
+| Denton | LIS PENDENS (NOTICE OF) (`LP`) | ✗ (Lot/Block only) | dash (detail page only) | Lot, Block | grantor=plaintiff | 4 |
+| Hidalgo | LIS PENDENS + NOTICE OF LIS PENDEN (URL codes = FULL NAMES) | ✗ | dash (detail page only) | — | standard | ~2 |
+| Cameron | type exists, **0 docs/year** | — | — | — | — | 0 |
+
+Rules that fall out of the matrix:
+- **Check the county's `counties.json` entry for `partyRoles`** — Bexar's lead
+  is the GRANTOR; Collin's parties can't be role-split from the index at all
+  (ship all parties, flagged).
+- Counties with legals only on detail pages (Collin, Denton, Hidalgo): open
+  each result row (`/doc/{id}`) and transcribe the Legal Description line —
+  volumes are small enough that this stays cheap. Denton's grid Lot/Block
+  columns allow the column-fallback without detail visits when speed matters.
+- Bexar: transcribe the extra columns verbatim as CSV headers
+  `Lot,Block,NCB,CountyBlock,PropertyAddress` — the parser's column fallback
+  makes address+lot/block rows joinable without a legal string.
+- Doc-type URL codes are per-county and inconsistent (short codes, full names,
+  or truncated names) — never guess; select via the picker once and read the
+  produced results URL.
+
+## Join playbook per verified county
+
+- **Dallas — DCAD** (`dallascad.org/SearchOwner.aspx`): owner search, then
+  legal cross-check on the detail page (see § Join above).
+- **Tarrant — TAD**: constructible legal-search URL
+  `tad.org/search-results?searchType=LegalDescription&filter=R&query={SUB} BLOCK {b} LOT {l}`
+  → exact parcel row; immune to owner-name drift. GEO ID = `{sub}-{block}-{lot}`.
+- **Bexar — BCAD** (`hgo.harrisgovern.com/bexar/property/search`): phrase-refined
+  ADDRESS search with the grid's Property Address column; cross-check
+  lot/block/CB in the returned legal. GEO ID = `{CB}-{blk}-{lot×10}`.
+- **Denton — Denton CAD** (`denton.prodigycad.com/property-search`): compound
+  text search on the defendant surname; cross-check the GEO ID
+  (`S{sub}-{block}-…-{lot}-…`) against the grid's Lot/Block.
+
 ## Verifying a new GovOS county
 
 Standard procedure (references/acclaim.md § Verifying a new county), plus:
 enumerate the county's lis pendens doc types in the Advanced Search picker and
-record the URL codes from the results URL; confirm the grid shows the same
-labeled-token legal format (the parser is format-strict — a county with a
-different legal template will send everything to review, which the >30%
-warning will catch); map the county's appraisal-district owner search
+record the URL codes from the results URL; determine which legal template the
+county uses (dash vs comma — the parser handles both; anything else sends rows
+to review, which the >30% warning will catch), whether legals render in-grid
+or only on detail pages, and any extra pre-parsed grid columns; **verify the
+party-role semantics** by reading 3–4 rows (who are the HOAs/lenders/taxing
+units? that side is the plaintiff) and record `partyRoles` if inverted or
+undifferentiated; map the county's appraisal-district owner search
 (Texas: every county has a CAD — Tarrant `tad.org`, Bexar `bcad.org`, Collin
 `collincad.org`, Denton `dentoncad.com`, Hidalgo `hidalgoad.org`, Cameron
 `cameroncad.org`) and record its search URL + cross-check anchors in
