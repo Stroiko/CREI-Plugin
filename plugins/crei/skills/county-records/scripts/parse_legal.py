@@ -295,6 +295,42 @@ def parse_legal_govos(legal: str) -> Union[ParsedNameLegal, ReviewRecord]:
     )
 
 
+# GA Landmark labeled legals (DeKalb): 'DIS:15 LAND:122 LOT:5 [BLK:D] [UNI:V]
+# SUB:RENAISSANCE LAKES Parcel: 15 122 02 012 Tax District:04 STREETNUM:3245 ...'.
+# Most records also carry a direct Parcel (handled by parcelExtract in
+# run_pipeline); this parser is the fallback that extracts SUB/LOT/BLK for
+# owner-lookup when no parcel is present.
+_GAL_LABELS = r"DIS|LAND|LOT|BLK|UNI|SUB|Parcel|Tax District|STREETNUM|STREET|SUFF|CITY|STATE|ZIP"
+_GAL_TOKEN = re.compile(
+    rf"\b({_GAL_LABELS})\s*:\s*(.+?)(?=\s+(?:{_GAL_LABELS})\s*:|$)", re.I)
+
+
+def parse_legal_ga_landmark(legal: str) -> Union[ParsedNameLegal, ReviewRecord]:
+    """Parse a GA Landmark labeled legal into subdivision + lot (+ block).
+    Only the FIRST legal's tokens are used (a record may repeat the block for
+    multiple addresses)."""
+    raw = (legal or "").strip()
+    if not raw:
+        return ReviewRecord("empty", raw)
+    tokens = {}
+    for m in _GAL_TOKEN.finditer(raw):
+        key = m.group(1).upper()
+        if key not in tokens:  # keep first occurrence
+            tokens[key] = m.group(2).strip()
+    subdivision = tokens.get("SUB", "").strip().upper() or None
+    lot = tokens.get("LOT", "").strip().upper() or None
+    if not subdivision:
+        return ReviewRecord("missing_fields", raw, detail="missing: subdivision name")
+    if not lot:
+        return ReviewRecord("missing_fields", raw, detail="missing: lot")
+    return ParsedNameLegal(
+        lot=lot,
+        block=(tokens.get("BLK", "").strip().upper() or None),
+        subdivision=subdivision,
+        raw=raw,
+    )
+
+
 _CC_SPLIT = re.compile(r"^CASE\s*#\s*([^/\s]+)\s*/\s*(.*)$")
 # L8, L84A, L8/9 (first taken), L137-139 (first taken), PARCEL 45
 _CC_LOT = re.compile(r"\b(?:L|PARCEL\s+)(\d+[A-Z]?)")

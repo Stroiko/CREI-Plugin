@@ -17,6 +17,7 @@ from pathlib import Path
 
 from parse_legal import (parse_legal, parse_legal_namebased, parse_legal_case_comments,
                          parse_legal_subfirst, parse_legal_labeled, parse_legal_govos,
+                         parse_legal_ga_landmark,
                          ParsedLegal, ParsedNameLegal, ParsedCaseComments)
 from build_parcel_id import build_parcel_id
 from match_lookup import match_parcel
@@ -170,8 +171,20 @@ def cmd_parse(args):
                 records.append(base)
                 continue
 
+        # Some counties EMBED a parcel ID inside a longer legal string (GA
+        # Landmark: "...SUB:RENAISSANCE LAKES Parcel: 15 122 02 012 Tax
+        # District:..."). `parcelExtract` is a search (not fullmatch) whose
+        # first group is the parcel - a direct join when present.
+        parcel_extract = (cfg.get("parcelId") or {}).get("parcelExtract")
+        if parcel_extract:
+            pm = re.search(parcel_extract, base["legal"])
+            if pm:
+                base.update(parcel_id=pm.group(1).strip(), subdivision=None)
+                records.append(base)
+                continue
+
         if legal_style in ("name-based", "name-based-subfirst", "labeled-tokens",
-                           "govos-labeled"):
+                           "govos-labeled", "ga-landmark"):
             # GovOS counties whose grid carries pre-parsed Lot/Block (and
             # sometimes PropertyAddress) columns instead of a legal string
             # (Bexar pattern): a row with an empty legal but usable columns is
@@ -192,7 +205,8 @@ def cmd_parse(args):
                     continue
             parser = {"name-based-subfirst": parse_legal_subfirst,
                       "labeled-tokens": parse_legal_labeled,
-                      "govos-labeled": parse_legal_govos}.get(
+                      "govos-labeled": parse_legal_govos,
+                      "ga-landmark": parse_legal_ga_landmark}.get(
                           legal_style, parse_legal_namebased)
             parsed = parser(base["legal"])
             if row.get("AllDefendants"):

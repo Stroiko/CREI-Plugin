@@ -90,12 +90,13 @@ skill has no map for.
 Follow the county's `vendor` entry to its verified handler:
 
 - **`acclaim` / `acclaim-v2`** → `references/acclaim.md`
-- **`landmark`** → `references/landmark.md` (key differences: disclaimer is a
-  modal per session; a **reCAPTCHA sits on the search form** — the user
-  clicks it, you submit immediately; doc type is set via a picker, never
-  typed; export is an **XLSX** — convert with
-  `python ${CLAUDE_SKILL_DIR}/scripts/xlsx_to_csv.py in.xlsx out.csv`; the
-  export carries **pre-parsed legal columns**, so parsing is nearly free)
+- **`landmark`** → `references/landmark.md` (disclaimer modal per session;
+  doc type set via a picker, never typed. **Regime is per-deployment:** FL
+  (Palm Beach) has an on-form **reCAPTCHA** — user clicks, you submit
+  immediately — and an **XLSX export** with **pre-parsed legal columns**
+  (`xlsx_to_csv.py`). **GA (DeKalb) has NO reCAPTCHA** (fully open) and
+  **labeled legals embedding a direct parcel** (`legalStyle: ga-landmark`,
+  join = direct-parcel on the county tax site). Read the county entry.)
 - **`newvision`** → `references/newvision.md` (BrowserView SPA, no CAPTCHA;
   results are one row PER PARTY — `*` marks the plaintiff; ingest via the
   **Print Results** page saved as text, then
