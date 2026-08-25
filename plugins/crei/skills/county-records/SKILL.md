@@ -69,7 +69,10 @@ Look up the county in `config/counties.json`:
 - **Found, `"verified": false`** → the portal flow works but the parcel join
   is unverified there. Tell the user leads will ship without appraiser
   enrichment unless you verify 3 real parcel joins first (procedure in
-  `references/acclaim.md` § Verifying a new county).
+  `references/acclaim.md` § Verifying a new county). To map an unverified or
+  unmapped county's appraiser join from scratch — which platform, which
+  strategy, the cross-check discipline — follow
+  **`references/appraiser-bootstrap.md`**.
 - **Not found** → run the full classification in
   `references/vendor-router.md`: fingerprint the VENDOR (Acclaim classic /
   Acclaim v2 / Tyler / custom), detect the ACCESS REGIME (open vs gated —
