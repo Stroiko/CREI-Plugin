@@ -1,0 +1,23 @@
+{
+  "address": "1925 Cottonwood Valley Cir, Dallas, TX 75201",
+  "cashflow": {"available": false},
+  "listing": {"available": true, "price": 480000, "zestimate": null, "status": "FORECLOSURE"},
+  "valuation": {},
+  "motivation": {
+    "listing_signals": {"available": true, "days_on_market": 120, "status": "FORECLOSURE"},
+    "distress": {
+      "available": true,
+      "plaintiff_name": "PARRISH, MARY",
+      "defendant_name": "PARRISH, JOHN A",
+      "doc_type": "LIS PENDENS",
+      "record_age_days": 10,
+      "owner": "PARRISH, JOHN A",
+      "use_desc": "SINGLE FAMILY RESIDENCE",
+      "market_value": 520000,
+      "homestead": true,
+      "absentee": false,
+      "out_of_state": false,
+      "tenure_years": 21
+    }
+  }
+}

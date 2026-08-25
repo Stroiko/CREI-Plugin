@@ -1,8 +1,8 @@
 {
   "name": "crei",
   "displayName": "CREI — Claude Real Estate Investing",
-  "version": "0.2.1",
-  "description": "Real estate investing suite: find motivated-seller leads from county distress records, enrich with ownership and Zillow listing data, score them into a ranked, explainable lead list, and analyze rental cash flow / DSCR under multiple rent scenarios including HUD Section 8 FMRs.",
+  "version": "0.3.0",
+  "description": "Real estate investing suite: find motivated-seller leads from county distress records, enrich with ownership and Zillow listing data, score them into a ranked, explainable lead list, score any single property on a multi-lens deal scorecard (cash flow, equity margin, and seller motivation), and analyze rental cash flow / DSCR under multiple rent scenarios including HUD Section 8 FMRs.",
   "author": {
     "name": "Stroiko Labs",
     "email": "kevin@stroikolabs.com"

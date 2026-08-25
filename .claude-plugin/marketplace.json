@@ -10,8 +10,8 @@
       "name": "crei",
       "source": "./plugins/crei",
       "displayName": "CREI — Claude Real Estate Investing",
-      "description": "Motivated-seller lead finder and deal analyzer: pulls county distress records and Zillow listing data, joins ownership data, produces a ranked explainable lead list, and runs multi-scenario rental cash flow / DSCR analysis with HUD Section 8 rents.",
-      "version": "0.2.1",
+      "description": "Motivated-seller lead finder and deal analyzer: pulls county distress records and Zillow listing data, joins ownership data, produces a ranked explainable lead list, scores any single property on a multi-lens deal scorecard, and runs multi-scenario rental cash flow / DSCR analysis with HUD Section 8 rents.",
+      "version": "0.3.0",
       "category": "productivity",
       "keywords": ["real-estate", "investing", "leads", "foreclosure", "zillow", "county-records", "cash-flow", "dscr", "section-8", "fmr", "rental-analysis"]
     }
