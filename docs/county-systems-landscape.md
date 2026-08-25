@@ -194,14 +194,16 @@ Never auto-register or enter payment anywhere (router rule). Regime is
 
 Shipped so far: **Acclaim** (Brevard pipeline), **Landmark Web** (Palm Beach
 verified 3/3), **NewVision BrowserView** (Polk verified 3/3), **Tyler
-Self-Service** (Orange verified 3/3), **GovOS Cloud Search** (Dallas verified
-3/3, 2026-08-24 — grid-transcription ingest, native export login-gated; six
-sister TX counties are unverified candidates in `counties.json`) — see
-vendor-router capability matrix.
+Self-Service** (Orange verified 3/3), **GovOS Cloud Search** (Dallas + Tarrant +
+Bexar + Denton verified 3/3), **Aumentum Public Access** (Alachua verified 3/3,
+2026-08-24 — grid-transcription ingest, subdivision-first legals reuse
+`name-based-subfirst`, `PIN` directs via directFormat) — see vendor-router
+capability matrix.
 
-1. **Aumentum Public Access** — strengthened by TX: Alachua FL + Travis TX +
-   Fort Bend TX, all on the identical ASP.NET variant (Version 2023.1.2), open.
-   One handler now covers 3 counties across 2 states; the JSP variant can wait.
+1. **Aumentum TX counties** — DONE FL: Alachua verified 3/3. Travis + Fort Bend
+   TX are unverified candidates on the identical ASP.NET variant, but their
+   legal format differs from FL STR — verify the TX legal template and map
+   Travis CAD / FBCAD before trusting (`references/aumentum.md` § Verifying).
 2. **Remaining GovOS counties** — DONE 2026-08-24: Tarrant, Bexar, Denton
    verified 3/3 (see vendor-router capability matrix); Collin + Hidalgo
    pull-verified with documented caveats (detail-page legals; Collin parties

@@ -504,5 +504,78 @@
       "type": "unknown",
       "notes": "bcpa.net - not mapped; no join path from the CSV to drive it."
     }
+  },
+  "alachua-fl": {
+    "displayName": "Alachua County, FL",
+    "state": "FL",
+    "vendor": "aumentum",
+    "regime": "open",
+    "landingUrl": "https://isol.alachuaclerk.org/RealEstate/SearchEntry.aspx",
+    "basePathHint": "/RealEstate",
+    "docTypes": {
+      "lis_pendens": ["LIS PENDENS", "LIS PENDENS FAMILY"],
+      "_urlCodes": { "LIS PENDENS": "LP", "LIS PENDENS FAMILY": "LPFAM" }
+    },
+    "csvColumns": {
+      "legal": "DocLegalDescription",
+      "caseNumber": null,
+      "provisional": null,
+      "_comment": "Grid transcription (no CSV export; 'Results List' free copy prints a report). Columns: Instrument #, Book-Page, Date Filed (=RecordDate), Doc Type, Party Name/Reverse Party Name, Legal, Status. Parties are tagged '[R] {plaintiff} [E] {defendant}' - split so DirectName=[R] (plaintiff: lender/HOA), IndirectName=[E] (defendant/owner=lead). STANDARD orientation. Strip trailing '(+)' (more-parties/legals marker) from all fields. No case numbers - cc_case cannot fire. ~18 LP+LPFAM per 4 weeks."
+    },
+    "legalStyle": "name-based-subfirst",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": "ACPA parcel 00000-000-000; not constructible from subdivision legals",
+      "directPattern": "PIN (\\d{5})(\\d{3})(\\d{3})",
+      "directFormat": "{0}-{1}-{2}",
+      "verified": true,
+      "verifiedDate": "2026-08-24",
+      "verifiedSamples": 3,
+      "notes": "Some legals ARE the parcel as 'PIN 18812010002' -> directPattern+directFormat reformats to 18812-010-002 for an instant join (verified: QUESADA MAURILIO PINO). Others are subdivision-first name legals joined by owner-lookup + legal cross-check: CAROL ESTATES LT 12 BLK B (ORAMA IVY, exact), LINCOLN ESTATES LT 91 92 (WATSON YVETTE, exact). One correct REFUSAL: YEADON JAMES search auto-jumped to a different Yeadon's STERLING PLACE parcel - legal cross-check refused it. HOA-defendant records often title-under-different-name -> ship unenriched. Live parse: 16/18 joinable (3 direct + 13 named), 2 review (metes-and-bounds SEC/TWP/RNG)."
+    },
+    "appraiser": {
+      "name": "ACPA",
+      "type": "owner-search",
+      "searchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=1081&LayerID=26490&PageTypeID=2&PageID=10768",
+      "parcelUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=1081&LayerID=26490&PageTypeID=4&PageID=10770&KeyValue={parcelId}",
+      "notes": "qPublic (Schneider). Accept the Terms modal once (Agree). 'Search by Owner Name' (Last First; a unique name jumps straight to the parcel report, else a results list); 'Search by Parcel Number' (00000-000-000) for PIN directs. Report page shows Subdivision + Legal Description ('CAROL ESTATES PB E-13 LOT 12 BK B') - CROSS-CHECK lot+block+plat book/page against the record; owner search matches loosely, so a legal mismatch = refuse (unenriched)."
+    }
+  },
+  "travis-tx": {
+    "displayName": "Travis County, TX",
+    "state": "TX",
+    "vendor": "aumentum",
+    "regime": "open",
+    "landingUrl": "https://tccsearch.org/",
+    "basePathHint": "/RealEstate",
+    "docTypes": { "lis_pendens": [] },
+    "legalStyle": "name-based-subfirst",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "Same Aumentum ASP.NET variant as Alachua (Version 2023.1.2), open after disclaimer accept-link. Doc-type codes, TX legal format (likely lot/block/subdivision or abstract, NOT FL STR), and join not yet verified. Appraiser is Travis CAD (traviscad.org)."
+    },
+    "appraiser": { "name": "Travis CAD", "type": "unknown", "notes": "traviscad.org - to be mapped during Travis verification." }
+  },
+  "fort-bend-tx": {
+    "displayName": "Fort Bend County, TX",
+    "state": "TX",
+    "vendor": "aumentum",
+    "regime": "open",
+    "landingUrl": "https://ccweb.co.fort-bend.tx.us/",
+    "basePathHint": "/RealEstate",
+    "docTypes": { "lis_pendens": [] },
+    "legalStyle": "name-based-subfirst",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "Same Aumentum variant as Alachua (Version 2023.1.2), open after disclaimer. NOTE: 500-result search cap (keep windows short). Doc types, TX legal format, and join not yet verified. Appraiser is FBCAD (fbcad.org)."
+    },
+    "appraiser": { "name": "FBCAD", "type": "unknown", "notes": "fbcad.org - to be mapped during Fort Bend verification." }
   }
 }
