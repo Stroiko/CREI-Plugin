@@ -218,10 +218,11 @@ capability matrix.
    (OnCore-style) fits here too.
 4. **Remaining Landmark/NewVision counties** — extend shipped handlers'
    capability rows: Lee (Akamai interstitial — user-assisted), St. Johns, Clay,
-   Hernando, Escambia; Osceola (BrowserView, expected identical to Polk);
-   **GA: Cobb (#3), DeKalb (#4), Cherokee (#7)** — the shipped Landmark handler's
-   cheapest new-state expansion (verify per-county capability rows, GA legals are
-   land-lot/district style so join strategies need GA appraiser mapping).
+   Hernando, Escambia; Osceola (BrowserView, expected identical to Polk).
+   **GA Landmark: DeKalb verified 3/3 2026-08-24** (fully open, no reCAPTCHA;
+   labeled legals embed a direct parcel → direct-parcel join on the county tax
+   site — the strongest join type); **Cobb + Cherokee** are candidates on the
+   same app (set each `parcelExtract` + map its appraiser).
 5. **DuProcess (Seminole)** — single FL county, JS app; do when Seminole matters.
 6. **Skip for now:** GSCCCA (gated/paid — the only route for 5 of GA's top 10;
    revisit as a **user-assisted** flow where the user logs into their own

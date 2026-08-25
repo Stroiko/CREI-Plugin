@@ -1,9 +1,15 @@
 # Landmark Web handler — verified reference
 
 Verified live on Palm Beach County FL (2026-08-24, full flow incl. export and
-3/3 parcel joins) and St. Johns County FL (structure identical). Lee County
-confirmed Landmark but sits behind an extra Akamai challenge. All steps are
-user-level browser actions; the ONE step requiring the human is the CAPTCHA.
+3/3 parcel joins), St. Johns County FL (structure identical), and **DeKalb
+County GA (2026-08-24, 3/3 direct-parcel joins — see § Georgia below)**. Lee
+County confirmed Landmark but sits behind an extra Akamai challenge.
+
+**Regime and legals are per-deployment.** FL Landmark (Palm Beach) has an
+on-form **reCAPTCHA** (one human click) and **pre-parsed lot/block/sub
+columns**. GA Landmark (DeKalb) has **NO reCAPTCHA** (fully open after the
+disclaimer) and **labeled legals that embed a direct parcel ID**. Read the
+county's `counties.json` entry; the two flows diverge at steps 7 and the join.
 
 ## Fingerprint
 
@@ -89,6 +95,34 @@ InstrumentNumber (owner-lookup convention).
 
 Condo units (Unit column instead of Lot) still parse and join — owner search
 doesn't depend on lot/block; cross-check unit + subdivision instead.
+
+## Georgia Landmark (DeKalb — verified 3/3)
+
+GA Superior Court Clerks run the same Landmark app, but the deployment differs:
+
+- **Open, no reCAPTCHA.** Flow is: Document Search tile → **Accept** disclaimer
+  modal → doc-type **checkbox list** (check LIS PENDENS, click **Select**) →
+  Begin/End dates → **Submit**. No human CAPTCHA step. "Clerk File Number
+  verified through <date>" banner is the released-through date.
+- **Ingest**: the grid shows Grantor/Grantee/Filing Date/Doc Type/Book/Page/
+  Cross-References but NOT the legal. Click a row's doc-type cell for the
+  detail, or use **Export** (XLSX) / **"Show all legal fields"**. Grantee =
+  defendant/owner = lead. No case numbers.
+- **Legals are labeled tokens with a DIRECT parcel** — the strongest join:
+  `DIS:15 LAND:122 LOT:5 SUB:RENAISSANCE LAKES Parcel: 15 122 02 012 Tax
+  District:04 STREETNUM:3245 STREET:DAVINCI SUFF:CT CITY:DECATUR ...`.
+  `legalStyle: ga-landmark`; config `parcelId.parcelExtract` pulls the Parcel
+  for a direct join, and `parse_legal_ga_landmark` extracts SUB/LOT/BLK as the
+  fallback for the rare record with no Parcel.
+- **Join = direct-parcel** on the county tax/appraiser site. DeKalb: DeKalb Tax
+  Commissioner (`publicaccess.dekalbtaxga.gov`, iasWorld), Parcel ID field
+  format `12 123 12 123` (with spaces). Verified 3/3: 15 122 02 012 → HOWARD
+  KIMBERLY NICOLE (defendant is current owner), 15 131 08 026 → FALL BRIDGET,
+  18 275 13 015 → 3230 OSBORNE RD (owner transferred post-filing — parcel +
+  address still verify; the owner change is useful distress signal).
+- **Cobb + Cherokee** are the same app (candidates in `counties.json`) but
+  their parcel format and appraiser differ — set each county's `parcelExtract`
+  and verify before trusting.
 
 ## Verifying a new Landmark county
 

@@ -505,6 +505,77 @@
       "notes": "bcpa.net - not mapped; no join path from the CSV to drive it."
     }
   },
+  "dekalb-ga": {
+    "displayName": "DeKalb County, GA",
+    "state": "GA",
+    "vendor": "landmark",
+    "regime": "open",
+    "landingUrl": "https://deeds.dekalbcountyga.gov/LandmarkWeb",
+    "basePathHint": "/LandmarkWeb",
+    "docTypes": {
+      "lis_pendens": ["LIS PENDENS"],
+      "_urlCodes": { "LIS PENDENS": "LP" }
+    },
+    "csvColumns": {
+      "legal": "DocLegalDescription",
+      "caseNumber": null,
+      "provisional": null,
+      "_comment": "GA Landmark is OPEN with NO reCAPTCHA (unlike Palm Beach/St. Johns) - just a per-session Accept disclaimer. Doc types are a checkbox list. Grid columns: Status, Grantor, Grantee, Filing Date, Doc Type, Book Type, Book, Page, Cross References, Comments - the full labeled legal is on each doc's detail (click the doc-type cell) or in the XLSX Export ('Show all legal fields'). Grantee = defendant/owner = lead (standard). No case numbers. ~13 LP/2wk."
+    },
+    "legalStyle": "ga-landmark",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": "DeKalb parcel '12 123 12 123' (with spaces); DELIVERED in the legal",
+      "parcelExtract": "Parcel:\\s*(\\d\\d \\d\\d\\d \\d\\d \\d\\d\\d)",
+      "verified": true,
+      "verifiedDate": "2026-08-24",
+      "verifiedSamples": 3,
+      "notes": "GA Landmark legals are labeled tokens embedding a DIRECT parcel: 'DIS:15 LAND:122 LOT:5 SUB:RENAISSANCE LAKES Parcel: 15 122 02 012 Tax District:04 STREETNUM:3245 STREET:DAVINCI ...'. parcelExtract pulls it for an instant join. Verified 3/3 on DeKalb Tax Commissioner: 15 122 02 012 -> HOWARD KIMBERLY NICOLE (3245 DA VINCI CT, defendant IS current owner), 15 131 08 026 -> FALL BRIDGET (4110 EMERALD LAKE DR, triple-match), 18 275 13 015 -> 3230 OSBORNE RD (owner since transferred to CHASE MGMT - still a valid parcel + address match). Records without a Parcel fall back to SUB+LOT owner-lookup."
+    },
+    "appraiser": {
+      "name": "DeKalb Tax Commissioner",
+      "type": "parcel-search",
+      "searchUrl": "https://publicaccess.dekalbtaxga.gov/search/commonsearch.aspx?mode=realprop",
+      "notes": "iasWorld (commonsearch.aspx). Accept the disclaimer once. Parcel ID field takes '12 123 12 123' (with spaces) - the exact value from the record's Parcel token; single result -> owner, address, value. Owner Name search (Last First) is the fallback for no-parcel records; cross-check the record's SUB/LOT/street. NOTE the defendant may no longer be the current owner (property transferred post-filing) - the parcel+address still verify the join; owner change is useful distress signal."
+    }
+  },
+  "cobb-ga": {
+    "displayName": "Cobb County, GA",
+    "state": "GA",
+    "vendor": "landmark",
+    "regime": "open",
+    "landingUrl": "https://superiorcourtclerk.cobbcounty.gov/landmark",
+    "basePathHint": "/landmark",
+    "docTypes": { "lis_pendens": [] },
+    "legalStyle": "ga-landmark",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "Landmark confirmed (title 'Landmark Web Home Page', path-mounted /landmark). Expected open like DeKalb (no reCAPTCHA) and same labeled legal format, but Cobb's parcel format + appraiser differ - set parcelExtract and verify before trusting. Appraiser: cobbassessor.org / Cobb GIS."
+    },
+    "appraiser": { "name": "Cobb Board of Tax Assessors", "type": "unknown", "notes": "cobbassessor.org - to be mapped during Cobb verification." }
+  },
+  "cherokee-ga": {
+    "displayName": "Cherokee County, GA",
+    "state": "GA",
+    "vendor": "landmark",
+    "regime": "open",
+    "landingUrl": "https://deeds.cherokeega.com/LandmarkWeb",
+    "basePathHint": "/LandmarkWeb",
+    "docTypes": { "lis_pendens": [] },
+    "legalStyle": "ga-landmark",
+    "joinStrategy": "owner-lookup",
+    "caseClassPatterns": {},
+    "parcelId": {
+      "format": null,
+      "verified": false,
+      "notes": "Landmark confirmed (title 'Landmark Web Official Records Search', /LandmarkWeb). Expected open + same labeled legals; Cherokee parcel format + appraiser (qPublic/Schneider) differ - set parcelExtract and verify before trusting."
+    },
+    "appraiser": { "name": "Cherokee County Assessor", "type": "unknown", "notes": "qPublic (Schneider) - to be mapped during Cherokee verification." }
+  },
   "alachua-fl": {
     "displayName": "Alachua County, FL",
     "state": "FL",
